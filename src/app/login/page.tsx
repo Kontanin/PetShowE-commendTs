@@ -1,38 +1,41 @@
-'use client'
+'use client';
 
-import {useUserStore } from "@/store/zustand";
+import { useUserStore } from '@/store/zustand';
 
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
-import { useRouter } from 'next/navigation'
-import doPostRequest from '@/components/req';
+import { useRouter } from 'next/navigation';
+import doPostRequest from '@/components/req/req';
 import { z } from 'zod';
 import InputWithLabel from '@/components/InputWithLabel';
 import { zodResolver } from '@hookform/resolvers/zod';
-
+import Cookies from 'js-cookie';
 
 import { url } from 'inspector';
 function Login() {
-  const {setUSer} = useUserStore()
+  const { setUSer } = useUserStore();
   const router = useRouter();
   const LoginSchema = z.object({
     email: z.string().email(),
     password: z.string(),
   });
-  
+
   const {
     register,
     formState: { errors },
     handleSubmit,
   } = useForm({ resolver: zodResolver(LoginSchema) });
 
-  const onhandle = async (data:any) => {
+  const onhandle = async (data: any) => {
+    console.log('login');
     let result = await doPostRequest(data, '/api/login');
-    console.log(result,"login");
-    
+    console.log(result, 'loginasdf');
+
     if (result) {
+      Cookies.set('authToken', result.token, { expires: 7 });
+      console.log('login', result.token, Cookies.get('authToken'));
       setUSer(result);
-      router.push('/')
+      //router.push('/');
     }
   };
 
@@ -58,11 +61,15 @@ function Login() {
               />
             </div>
 
-            <div className="flex content-center justify-center  w-25 bg-stone-50 border text-zinc-50">
-              <button className="content-center w-32 bg-red-400 rounded-lg ">
-                Submit
-              </button>
-            </div>
+            {/* <div className="flex content-center justify-center  w-25 bg-stone-50 border text-zinc-50"> */}
+
+            <button
+              className="content-center w-32 bg-red-400 rounded-lg "
+              type="submit"
+            >
+              Submit
+            </button>
+            {/* </div> */}
           </form>
         </div>
         <div className="flex content-center  justify-center">

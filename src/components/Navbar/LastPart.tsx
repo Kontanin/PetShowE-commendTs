@@ -1,0 +1,98 @@
+import React, { useEffect, useState } from 'react';
+import {
+  NavbarContent,
+  NavbarItem,
+  Link,
+  Button,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  Badge,
+} from '@nextui-org/react';
+import { BsBag } from 'react-icons/bs';
+import { FaUserCircle } from 'react-icons/fa';
+import Cookies from 'js-cookie';
+import validateToken from '@/utils/validateToken';
+import MapProduct from '@/components/productslice/mapProduct';
+import Profile from '@/components/Profile';
+
+export default function Lastpart() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkToken = async () => {
+      const isValid = await validateToken();
+      console.log(isValid);
+      setIsAuthenticated(isValid);
+    };
+
+    checkToken();
+  }, []);
+
+  return (
+    <NavbarContent justify="end">
+      <Popover placement="bottom">
+        <PopoverTrigger>
+          <Button className="bg-red-500 hover:bg-red-600 rounded-full p-2">
+            <Badge content="5" color="primary" placement="bottom-right">
+              <BsBag size={30} />
+            </Badge>
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent>
+          <Link href="/cart">Buy Now</Link>
+          <MapProduct />
+        </PopoverContent>
+      </Popover>
+
+      {isAuthenticated ? (
+        <Popover placement="bottom">
+          <PopoverTrigger>
+            <Button className="flex items-center space-x-2 bg-transparent hover:bg-gray-200 rounded-full p-2">
+              <FaUserCircle size={30} className="text-gray-700" />
+              <span className="hidden lg:inline text-gray-700">Profile</span>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="p-4">
+            <Link
+              href="/profile"
+              className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded"
+            >
+              Profile
+            </Link>
+            <Link
+              href="/settings"
+              className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded"
+            >
+              Settings
+            </Link>
+            <Link
+              href="/logout"
+              className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded"
+            >
+              Logout
+            </Link>
+          </PopoverContent>
+        </Popover>
+      ) : (
+        <div className="flex items-center space-x-4">
+          <NavbarItem className="hidden lg:flex">
+            <Link
+              href="/login  "
+              className="text-blue-500 hover:text-blue-700 font-medium"
+            >
+              Login
+            </Link>
+          </NavbarItem>
+          <Button
+            as={Link}
+            href=""
+            className="bg-yellow-500 text-black hover:bg-yellow-600 rounded-full px-4 py-2"
+          >
+            Sign Up
+          </Button>
+        </div>
+      )}
+    </NavbarContent>
+  );
+}

@@ -1,33 +1,24 @@
-
-
-"use client"
+'use client';
 import React, { useState } from 'react';
-import FormSubmitButton from "@/components/FormSubmitButton";
+import FormSubmitButton from '@/components/FormSubmitButton';
 
-
-
-
-
-
-export default  function AddProductPage() {
+export default function AddProductPage() {
   const [file, setFile] = useState<File | null>(null);
 
-const handle = async (e: React.FormEvent) => {
-  console.log("file", e);
-  e.preventDefault(); // Prevents the default form submission behavior
-  // Handle form submission here
-  const formData = new FormData(e.currentTarget as HTMLFormElement);
+  const handle = async (e: React.FormEvent) => {
+    console.log('file', e);
+    e.preventDefault(); // Prevents the default form submission behavior
+    // Handle form submission here
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
 
-  // Log the name and price values
-  console.log('Name:', formData.get('name'));
-  console.log('Price:', formData.get('price'));
-}
+    // Log the name and price values
+    console.log('Name:', formData.get('name'));
+    console.log('Price:', formData.get('price'));
+  };
 
-
-const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  setFile(e.target.files ? e.target.files[0] : null);
-};
-
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFile(e.target.files ? e.target.files[0] : null);
+  };
 
   return (
     <div>
@@ -59,11 +50,7 @@ const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
           type="number"
           className="input-bordered input mb-3 w-full"
         />
-        <input
-
-          type="file"
-          onChange={handleFileChange}
-        />
+        <input type="file" onChange={handleFileChange} />
         <FormSubmitButton className="btn-block">Add Product</FormSubmitButton>
       </form>
     </div>

@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState, useTransition } from "react";
+import { useState, useTransition } from 'react';
 
 interface AddToCartButtonProps {
   productId: string;

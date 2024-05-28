@@ -1,44 +1,37 @@
-import React from 'react';
-import ProductList from './productList';
-function page() {
+'use client';
+
+import { NextPage } from 'next';
+import React, { useState, useEffect } from 'react';
+import FilterSidebar from '@/components/productslice/FilterSidebar';
+import ProductGrid from '@/components/productslice/ProductGrid';
+
+import Link from 'next/link';
+
+// import CategoryDropdown from '@/components/productslice/CategoryDropdown';
+const Home: NextPage = () => {
+  const [filters, setFilters] = useState<string[]>([]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 500]);
+
   return (
-
-
-  <div className=" ">
-    <h1 className="text-4xl font-bold text-start text-gray-700 my-3">Product</h1>
-    <div className='flex flex-row'>
-    <div className="w-1/6 ">
-
-      <div className="flex items-center">
-        <input
-          type="radio"
-          className="form-radio text-indigo-600"
-          name="radio"
-          id="radio1"
-        />
-        <label className="ml-2">Option 1</label>
-      </div>
-
-      <div className="flex items-center">
-        <input
-                type="radio"
-                className="form-radio text-indigo-600"
-                name="radio"
-                id="radio2"
-        />
-        <label className="ml-2">Option 2</label>
+    <div>
+      <header className="flex justify-between p-4 bg-yellow-400">
+        {/* //<CategoryDropdown /> */}
+      </header>
+      <div className="flex">
+        <div className="w-1/4">
+          <FilterSidebar
+            filters={filters}
+            priceRange={priceRange}
+            onFilterChange={setFilters}
+            onPriceChange={setPriceRange}
+          />
+        </div>
+        <div className="w-3/4 p-4">
+          <ProductGrid filters={filters} priceRange={priceRange} />
+        </div>
       </div>
     </div>
-
-    <div className="w-5/6 border-2 border-rose-60 h">
-
-      <div className="flex flex-wrap "><ProductList/></div>
-    </div>
-
-    </div>
-  </div>
-
   );
-}
+};
 
-export default page;
+export default Home;

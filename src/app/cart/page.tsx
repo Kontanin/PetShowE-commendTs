@@ -1,39 +1,178 @@
-import React from 'react'
-import products from './mockData.json';
-import Image from 'next/image';
+// pages/shopping-bag.tsx
+'use client';
 
-type Product = {
-  id: string;
-  image: string;
-  productName: string;
+import Image from 'next/image';
+import { useState } from 'react';
+
+interface Item {
+  id: number;
+  name: string;
   description: string;
-  stock: number; 
-  unitPrice: number;
-  freeShipping: boolean; 
-  company: string; 
-  category: string; 
+  shippedFrom: string;
+  color: string;
+  size: string;
+  price: number;
+  shippingCost: number;
+  quantity: number;
+  imageUrl: string;
+}
+
+const items: Item[] = [
+  {
+    id: 1,
+    name: 'MARNI',
+    description: 'Blue Trunk Bag in Buffalo',
+    shippedFrom: 'Marni',
+    color: 'Blue',
+    size: 'One Size',
+    price: 2150.0,
+    shippingCost: 15.0,
+    quantity: 1,
+    imageUrl: '/path/to/marni-bag.jpg',
+  },
+  {
+    id: 2,
+    name: 'COMMON PROJECTS',
+    description: 'White Achilles Retro Low Sneaker',
+    shippedFrom: 'Ssense',
+    color: 'White',
+    size: 'IT 36',
+    price: 485.0,
+    shippingCost: 0.0,
+    quantity: 1,
+    imageUrl: '/path/to/common-projects.jpg',
+  },
+  {
+    id: 3,
+    name: 'MAJE',
+    description: 'ECLARE Ethnic Poncho',
+    shippedFrom: 'Maje',
+    color: 'Grey',
+    size: 'One Size',
+    price: 220.0,
+    shippingCost: 0.0,
+    quantity: 1,
+    imageUrl: '/path/to/maje-poncho.jpg',
+  },
+];
+
+const groupBy = <T,>(array: T[], key: keyof T): Record<string, T[]> => {
+  return array.reduce(
+    (result, currentValue) => {
+      const groupKey = currentValue[key] as unknown as string;
+      if (!result[groupKey]) {
+        result[groupKey] = [];
+      }
+      result[groupKey].push(currentValue);
+      return result;
+    },
+    {} as Record<string, T[]>,
+  );
 };
 
-export default function page() {
-  let newp: Product = products[0]; 
+const ShoppingBag = () => {
+  const groupedItems = groupBy(items, 'shippedFrom');
+  const [itemQuantities, setItemQuantities] = useState(
+    items.map(item => ({ id: item.id, quantity: item.quantity })),
+  );
+
+  const handleQuantityChange = (id: number, quantity: number) => {
+    setItemQuantities(
+      itemQuantities.map(item =>
+        item.id === id ? { ...item, quantity } : item,
+      ),
+    );
+  };
+
+  const getItemQuantity = (id: number) => {
+    const item = itemQuantities.find(item => item.id === id);
+    return item ? item.quantity : 1;
+  };
+
+  const subtotal = items.reduce(
+    (sum, item) => sum + item.price * getItemQuantity(item.id),
+    0,
+  );
+  const totalShipping = items.reduce((sum, item) => sum + item.shippingCost, 0);
+  const total = subtotal + totalShipping;
+
   return (
-    <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
-
-    <Image
-      src={newp.image }
-      alt={newp.productName}
-      width={500}
-      height={500}
-      className="rounded-lg"
-
-    />
-
-    <div>
-      <h1 className="text-5xl font-bold">{newp.productName}</h1>
-
-      <p className="py-6">{newp["description"]}</p> 
-
+    <div className="min-h-full bg-gray-100 flex items-start justify-center py-10">
+      <div className="bg-white shadow-md rounded-lg w-3/4 p-8">
+        <h2 className="text-2xl font-semibold mb-6">Your Shopping Bag</h2>
+        {Object.keys(groupedItems).map(key => (
+          <div key={key}>
+            <h3 className="text-xl font-semibold mb-4">{key}</h3>
+            <div className="space-y-4">
+              {groupedItems[key].map(item => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between p-4 border rounded-lg"
+                >
+                  <div className="flex items-center space-x-4">
+                    <Image
+                      src={item.imageUrl}
+                      alt={item.description}
+                      width={50}
+                      height={50}
+                    />
+                    <div>
+                      <h3 className="font-semibold">{item.name}</h3>
+                      <p className="text-sm text-gray-500">
+                        {item.description}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        Color: {item.color}, Size: {item.size}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <span>${item.price.toFixed(2)}</span>
+                    <span>
+                      {item.shippingCost > 0
+                        ? `Est. shipping $${item.shippingCost.toFixed(2)}`
+                        : 'Free shipping'}
+                    </span>
+                    <input
+                      type="number"
+                      className="w-12 text-center border rounded"
+                      value={getItemQuantity(item.id)}
+                      min={1}
+                      onChange={e =>
+                        handleQuantityChange(item.id, parseInt(e.target.value))
+                      }
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+        <div className="mt-6 border-t pt-4">
+          <div className="flex justify-between text-lg font-semibold">
+            <span>Subtotal:</span>
+            <span>${subtotal.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between text-lg font-semibold">
+            <span>Estimated Shipping:</span>
+            <span>${totalShipping.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between text-xl font-bold mt-4">
+            <span>Total:</span>
+            <span>${total.toFixed(2)}</span>
+          </div>
+        </div>
+        <div className="mt-6 flex justify-end space-x-4">
+          <button className="px-6 py-2 border rounded-lg">
+            Continue Shopping
+          </button>
+          <button className="px-6 py-2 bg-blue-600 text-white rounded-lg">
+            Secure Checkout
+          </button>
+        </div>
+      </div>
     </div>
-  </div>
-  )
-}
+  );
+};
+
+export default ShoppingBag;

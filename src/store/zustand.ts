@@ -1,38 +1,39 @@
 import axios from 'axios';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import validateToken from '@/utils/validateToken'; // Adjust the import path accordingly
 
-type HeaderStore = {
-  goBackUrl: string;
-  setGoBackUrl: (url: string) => void;
-  setHeader: (header: string) => void;
-  setWidth: (width: string) => void;
-  widthWindow: number;
-};
 
-export enum headerType {
-  NORMAL_STATE,
-  OPEN_FILLTER,
-  GOBACK_STATE,
-}
+
+
 
 type UserTypes = {
   email: string;
   password: string;
   id: string;
   username: string;
+  role: string; // Add this line
 };
 
-type USerstrore = {
+type UserStore = {
   id: string;
   role: string;
-  setUSer: (user: UserTypes) => void;
+  isAuthenticated: boolean;
+  setUser: (user: UserTypes) => void;
+  setIsAuthenticated: (auth: boolean) => void;
+  checkToken: () => Promise<void>;
 };
 
 interface Product {
-  id: number;
-  name: string;
-  price: number;
+  id: string;
+  productName: string;
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  image: string;
+  freeShipping: boolean;
+  company: string;
+  category: string;
 }
 
 interface Profile {
@@ -46,24 +47,43 @@ interface AppData {
   favorites: Product[];
   searchHistory: string[];
 }
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-}
 
-interface CartOrder {
+
+interface StoreState {
   cart: Product[];
-  setCart: (cart: Product[]) => void;
+  addToCart: (product: Product) => void;
+  createOrder: () => Promise<void>;
+  clearCart: () => void;
 }
-
 // Create the store with persist middleware
-export const useCartStore = create(
-  persist<CartOrder>(
+export const StoreState = create(
+  persist<StoreState>(
     set => ({
       cart: [],
-      setCart: (cart: Product[]) => {
-        set({ cart });
+      addToCart: (newProduct: Product) => {
+        set(state => {
+          // Check if the product already exists in the cart
+          const existingProductIndex = state.cart.findIndex(
+            item => item.id === newProduct.id
+          );
+
+          if (existingProductIndex > -1) {
+            // Product exists, increment the quantity
+            const updatedCart = state.cart.map((item, index) =>
+              index === existingProductIndex
+                ? { ...item, quantity: item.quantity + newProduct.quantity }
+                : item
+            );
+            return { cart: updatedCart };
+          } else {
+            // Product does not exist, add to cart
+            return { cart: [...state.cart, newProduct] };
+          }
+        });
+      },
+      createOrder: async () => {},
+      clearCart: () => {
+        set({ cart: [] });
       },
     }),
     {
@@ -74,14 +94,22 @@ export const useCartStore = create(
 );
 
 export const useUserStore = create(
-  persist<USerstrore>(
+  persist<UserStore>(
     (set, get) => ({
       id: '',
       role: '',
-      setUSer: (user: UserTypes) => {
-        set({ id: user.id, role: user.id });
+      isAuthenticated: false,
+      setUser: (user: UserTypes) => {
+        set({ id: user.id, role: user.role });
+      },
+      setIsAuthenticated: (auth: boolean) => {
+        set({ isAuthenticated: auth });
+      },
+      checkToken: async () => {
+        const isValid = await validateToken();
+        set({ isAuthenticated: isValid });
       },
     }),
-    { getStorage: () => localStorage, name: 'userStore' },
+    { name: 'userStore', storage: createJSONStorage(() => localStorage) },
   ),
 );

@@ -1,3 +1,4 @@
+// components/Productslice/FilterSidebar.tsx
 import React, { useState, useEffect } from 'react';
 import { toSlug } from '@/utils/slug';
 
@@ -23,8 +24,9 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
 
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const filter = event.target.value;
+
     let newFilters;
-    console.log('filter', filter);
+
     if (filters.includes(filter)) {
       newFilters = filters.filter(f => f !== filter);
     } else {
@@ -32,6 +34,13 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
     }
 
     onFilterChange(newFilters);
+    console.log(
+      filter,
+      'change',
+      filter.includes(toSlug('Water-animal')),
+      toSlug('Water-animal'),
+      filter,
+    );
   };
 
   const handlePriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,10 +65,6 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
         <div className="flex justify-between">
           <span>${localPriceRange[0]}</span>
           <span>${localPriceRange[1]}</span>
-          <span>
-            {filters}
-            {'rtest  ' + filters.includes(toSlug('Wateranimal'))}
-          </span>
         </div>
       </div>
       <div className="mt-4">

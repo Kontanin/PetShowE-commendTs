@@ -33,7 +33,7 @@ export default function FristPart() {
       >
         <DropdownItem>
           <Link
-            href="/product/dog"
+            href="/product?category=dog"
             className="grid justify-items-center"
             color="foreground"
           >
@@ -42,7 +42,7 @@ export default function FristPart() {
         </DropdownItem>
         <DropdownItem>
           <Link
-            href="/product/cat"
+            href="/product?category=cat"
             className="grid justify-items-center"
             color="foreground"
           >
@@ -52,7 +52,7 @@ export default function FristPart() {
 
         <DropdownItem>
           <Link
-            href="/product/bird"
+            href="/product?category=cat"
             className="grid justify-items-center"
             color="foreground"
           >
@@ -62,7 +62,7 @@ export default function FristPart() {
 
         <DropdownItem>
           <Link
-            href="/product/water-animal"
+            href="/product?category=water-animal"
             className="grid justify-items-center"
             color="foreground"
           >
@@ -72,7 +72,7 @@ export default function FristPart() {
 
         <DropdownItem>
           <Link
-            href="/product/exotic"
+            href="/product?category=exotic"
             color="foreground"
             className="grid justify-items-center"
           >

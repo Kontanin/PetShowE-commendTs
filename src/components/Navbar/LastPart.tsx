@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   NavbarContent,
   NavbarItem,
@@ -12,36 +12,36 @@ import {
 import { BsBag } from 'react-icons/bs';
 import { FaUserCircle } from 'react-icons/fa';
 import Cookies from 'js-cookie';
-import validateToken from '@/utils/validateToken';
-import MapProduct from '@/components/productslice/mapProduct';
-import Profile from '@/components/Profile';
-
+import CartOrder from '@/components/CartIcon/CartOrder';
+import { useUserStore } from '@/store/zustand';
+import { StoreState } from '@/store/zustand';
 export default function Lastpart() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    const checkToken = async () => {
-      const isValid = await validateToken();
-      console.log(isValid);
-      setIsAuthenticated(isValid);
-    };
-
-    checkToken();
-  }, []);
+  const Order = StoreState(state => state.cart);
+  const { isAuthenticated, setIsAuthenticated } = useUserStore();
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    Cookies.remove('token'); // Assuming 'token' is the name of your authentication cookie
+    // Optionally redirect the user after logout
+    window.location.href = '/';
+  };
 
   return (
     <NavbarContent justify="end">
       <Popover placement="bottom">
         <PopoverTrigger>
           <Button className="bg-red-500 hover:bg-red-600 rounded-full p-2">
-            <Badge content="5" color="primary" placement="bottom-right">
+            <Badge
+              content={Order.length}
+              color="primary"
+              placement="bottom-right"
+            >
               <BsBag size={30} />
             </Badge>
           </Button>
         </PopoverTrigger>
         <PopoverContent>
           <Link href="/cart">Buy Now</Link>
-          <MapProduct />
+          <CartOrder />
         </PopoverContent>
       </Popover>
 
@@ -55,10 +55,10 @@ export default function Lastpart() {
           </PopoverTrigger>
           <PopoverContent className="p-4">
             <Link
-              href="/profile"
+              href="/myprofile"
               className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded"
             >
-              Profile
+              My Profile
             </Link>
             <Link
               href="/settings"
@@ -66,12 +66,12 @@ export default function Lastpart() {
             >
               Settings
             </Link>
-            <Link
-              href="/logout"
+            <p
+              onClick={handleLogout}
               className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded"
             >
               Logout
-            </Link>
+            </p>
           </PopoverContent>
         </Popover>
       ) : (

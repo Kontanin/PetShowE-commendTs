@@ -5,6 +5,7 @@ import NavbarMain from '../components/Navbar/navbar';
 const inter = Inter({ subsets: ['latin'] });
 import Footer from '../components/Footer/footer';
 import Head from 'next/head';
+
 export const metadata: Metadata = {
   title: 'Pet Shop',
   description: 'We care  evry  detail  for pet',
@@ -22,6 +23,7 @@ export default function RootLayout({
       </Head>
       <body className={inter.className}>
         <NavbarMain></NavbarMain>
+
         <div className="flex justify-center">
           <div className="w-3/4">{children}</div>
         </div>

@@ -5,7 +5,7 @@ import mockData from './mockData1.json';
 import { IoMdArrowForward } from 'react-icons/io';
 import { FiTrash2 } from 'react-icons/fi';
 
-import MapProduct from '@/components/productslice/mapProduct';
+import MapProduct from '@/components/productslice/CartOrder';
 export default function SliderBar() {
   // const [isOpen,setIsOpen]=useState(false);
   let isOpen = true;

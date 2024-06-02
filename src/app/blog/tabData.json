@@ -134,7 +134,7 @@
   {
     "id": "13",
     "title": "Exotic Animals: Unique and Fascinating",
-    "tag": "Exotic Animals",
+    "tag": "Exotic",
     "content": "Exotic animals are unique and fascinating.",
     "userId": "user13",
     "username": "Kyle",
@@ -145,7 +145,7 @@
   {
     "id": "14",
     "title": "Caring for Exotic Pets",
-    "tag": "Exotic Animals",
+    "tag": "Exotic",
     "content": "Tips for taking care of exotic pets.",
     "userId": "user14",
     "username": "Laura",
@@ -156,7 +156,7 @@
   {
     "id": "15",
     "title": "Exotic Pet Nutrition",
-    "tag": "Exotic Animals",
+    "tag": "Exotic",
     "content": "Ensure your exotic pet gets the right nutrition.",
     "userId": "user15",
     "username": "Mike",

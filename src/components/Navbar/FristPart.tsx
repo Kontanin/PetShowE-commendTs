@@ -76,7 +76,7 @@ export default function FristPart() {
             color="foreground"
             className="grid justify-items-center"
           >
-            Exotic Animal
+            Exotic
           </Link>
         </DropdownItem>
       </DropdownMenu>

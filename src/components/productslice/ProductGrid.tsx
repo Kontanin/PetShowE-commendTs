@@ -1,3 +1,4 @@
+// components/Productslice/ProductGrid.tsx
 import React from 'react';
 import { toSlug } from '@/utils/slug';
 import Link from 'next/link';
@@ -18,12 +19,14 @@ interface ProductGridProps {
   filters: string[] | null;
   priceRange: [number, number];
   products: Product[];
+  search: string;
 }
 
 const ProductGrid: React.FC<ProductGridProps> = ({
   filters,
   priceRange,
   products,
+  search,
 }) => {
   const filteredProducts = products.filter(product => {
     const matchesFilters =
@@ -32,8 +35,11 @@ const ProductGrid: React.FC<ProductGridProps> = ({
       filters.includes(toSlug(product.category));
     const matchesPrice =
       product.unitPrice >= priceRange[0] && product.unitPrice <= priceRange[1];
+    const matchesSearch = product.productName
+      .toLowerCase()
+      .includes(search.toLowerCase());
 
-    return matchesFilters && matchesPrice;
+    return matchesFilters && matchesPrice && matchesSearch;
   });
 
   return (
@@ -69,3 +75,4 @@ const ProductGrid: React.FC<ProductGridProps> = ({
 };
 
 export default ProductGrid;
+

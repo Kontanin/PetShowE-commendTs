@@ -7,6 +7,8 @@ interface FilterSidebarProps {
   priceRange: [number, number];
   onFilterChange: (filters: string[]) => void;
   onPriceChange: (priceRange: [number, number]) => void;
+  search: string;
+  onSearchChange: (search: string) => void;
 }
 
 const FilterSidebar: React.FC<FilterSidebarProps> = ({
@@ -14,6 +16,8 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
   priceRange,
   onFilterChange,
   onPriceChange,
+  search,
+  onSearchChange,
 }) => {
   const [localPriceRange, setLocalPriceRange] =
     useState<[number, number]>(priceRange);
@@ -24,7 +28,6 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
 
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const filter = event.target.value;
-
     let newFilters;
 
     if (filters.includes(filter)) {
@@ -34,13 +37,6 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
     }
 
     onFilterChange(newFilters);
-    console.log(
-      filter,
-      'change',
-      filter.includes(toSlug('Water-animal')),
-      toSlug('Water-animal'),
-      filter,
-    );
   };
 
   const handlePriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,8 +46,22 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
     onPriceChange(newPriceRange);
   };
 
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onSearchChange(event.target.value);
+  };
+
   return (
     <div className="p-4">
+      <div>
+        <h3 className="font-bold mb-2">Search</h3>
+        <input
+          type="text"
+          value={search}
+          onChange={handleSearchChange}
+          placeholder="Search product name"
+          className="w-full h-10 border border-gray-300 rounded"
+        />
+      </div>
       <div>
         <h3 className="font-bold mb-2">Price Range</h3>
         <input

@@ -1,11 +1,9 @@
 // pages/index.tsx or pages/cat.tsx (wherever you want to use it)
 'use client';
-
 import { NextPage } from 'next';
 import React, { useState, useEffect } from 'react';
 import FilterSidebar from '@/components/Productslice/FilterSidebar';
 import ProductGrid from '@/components/Productslice/ProductGrid';
-import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 
 interface Product {
@@ -82,11 +80,13 @@ const Home: NextPage = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get('category');
+  const searchQuery = searchParams.get('search') || '';
 
   const [filters, setFilters] = useState<string[]>(
     categoryParam ? categoryParam.split('&&') : [],
   );
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 500]);
+  const [search, setSearch] = useState<string>(searchQuery);
 
   useEffect(() => {
     setFilters(categoryParam ? categoryParam.split('&&') : []);
@@ -96,8 +96,14 @@ const Home: NextPage = () => {
     setFilters(newFilters);
     const url =
       newFilters.length > 0
-        ? `${pathname}?category=${newFilters.join('&&')}`
+        ? `${pathname}?category=${newFilters.join('&&')}&search=${search}`
         : pathname;
+    window.history.pushState({}, '', url);
+  };
+
+  const handleSearchChange = (search: string) => {
+    setSearch(search);
+    const url = `${pathname}?category=${filters.join('&&')}&search=${search}`;
     window.history.pushState({}, '', url);
   };
 
@@ -110,6 +116,8 @@ const Home: NextPage = () => {
             priceRange={priceRange}
             onFilterChange={handleFilterChange}
             onPriceChange={setPriceRange}
+            search={search}
+            onSearchChange={handleSearchChange}
           />
         </div>
         <div className="w-3/4 p-4">
@@ -117,6 +125,7 @@ const Home: NextPage = () => {
             filters={filters}
             priceRange={priceRange}
             products={products}
+            search={search}
           />
         </div>
       </div>

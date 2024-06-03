@@ -41,7 +41,7 @@ Another variant of the registration page, possibly for a multi-step registration
 
 ### 8. Screenshot 2024-06-03 130220
 
-![Screenshot 2024-06-03 130220](./readmepic/Screenshot2024-06-03_130220.png)
+![Screenshot 2024-06-03 130220](./readmepic/NarvigatePopUp.png)
 A general screenshot captured on June 3, 2024, showcasing one of the application's pages.
 
 ## How to Run

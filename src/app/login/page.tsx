@@ -45,7 +45,7 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="pt-32 pb-32 flex items-center justify-center bg-gray-100">
       <div className="bg-white rounded-lg shadow-lg flex max-w-4xl w-full">
         <div className="w-1/2 p-8 bg-[#F7931E] text-white rounded-l-lg flex flex-col justify-center">
           <h1 className="text-4xl font-bold mb-4">Hey There!</h1>
@@ -88,7 +88,11 @@ function Login() {
                 type="submit"
                 disabled={isLoading}
               >
-                {isLoading ? <ClipLoader color="#ffffff" size={24} /> : 'Sign In'}
+                {isLoading ? (
+                  <ClipLoader color="#ffffff" size={24} />
+                ) : (
+                  'Sign In'
+                )}
               </button>
             </div>
             <div className="text-center">
@@ -120,4 +124,3 @@ function Login() {
 }
 
 export default Login;
-

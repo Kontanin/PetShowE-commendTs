@@ -3,7 +3,7 @@ import { Image } from '@nextui-org/react';
 
 
 export default function Product({ OneProduc }: any) {
-  let num = 0;
+
   let { productName, image, unitPrice } = OneProduc;
 
   return (

@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useUserStore } from '@/store/zustand';
+
+import { UserStore } from '@/store/UserStore';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
@@ -18,7 +19,7 @@ const LoginSchema = z.object({
 });
 
 function Login() {
-  const { setUser, setIsAuthenticated } = useUserStore();
+  const { setUser, setIsAuthenticated } = UserStore();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 

@@ -13,11 +13,11 @@ import { BsBag } from 'react-icons/bs';
 import { FaUserCircle } from 'react-icons/fa';
 import Cookies from 'js-cookie';
 import CartOrder from '@/components/CartIcon/CartOrder';
-import { useUserStore } from '@/store/zustand';
-import { StoreState } from '@/store/zustand';
+import { UserStore } from '@/store/UserStore';
+import { CartState } from '@/store/CartStore';
 export default function Lastpart() {
-  const Order = StoreState(state => state.cart);
-  const { isAuthenticated, setIsAuthenticated } = useUserStore();
+  const Order = CartState(state => state.cart);
+  const { isAuthenticated, setIsAuthenticated } = UserStore();
   const handleLogout = () => {
     setIsAuthenticated(false);
     Cookies.remove('token'); // Assuming 'token' is the name of your authentication cookie
@@ -45,7 +45,7 @@ export default function Lastpart() {
         </PopoverContent>
       </Popover>
 
-      {isAuthenticated ? (
+      {isAuthenticated? (
         <Popover placement="bottom">
           <PopoverTrigger>
             <Button className="flex items-center space-x-2 bg-transparent hover:bg-gray-200 rounded-full p-2">

@@ -1,10 +1,10 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import products from './mockData.json';
 import Image from 'next/image';
 import AddToCartButton from '../../../components/ProductCart/AddToCartButton';
 import PriceTag from '@/components/PriceTag';
-import { StoreState } from '@/store/zustand';
+import { CartState } from '@/store/CartStore';
 
 interface ProductPageProps {
   params: {
@@ -13,14 +13,20 @@ interface ProductPageProps {
 }
 
 export default function ProductPage({ params: { id } }: ProductPageProps) {
+  const [selectedQuantity, setSelectedQuantity] = useState(1);
+  const [stock, updatestock] = useState(0);
   const newp = products.find(product => product.id === id);
+  const addToCart = CartState(state => state.addToCart);
+
+  useEffect(() => {
+    if (newp) {
+      updatestock(newp.stock);
+    }
+  }, [newp]);
+
   if (!newp) {
     return <div className="text-center text-red-600">Product not found</div>;
   }
-
-  const addToCart = StoreState(state => state.addToCart);
-  const [selectedQuantity, setSelectedQuantity] = useState(1);
-  const [stock, updatestock] = useState(newp.stock);
 
   const handleQuantityChange = (quantity: number) => {
     setSelectedQuantity(quantity);
@@ -29,9 +35,10 @@ export default function ProductPage({ params: { id } }: ProductPageProps) {
   const handleAddtoCart = () => {
     const { stock, ...rest } = newp;
     const cartItem = { ...rest, quantity: selectedQuantity };
+    console.log("add")
     addToCart(cartItem);
     newp.stock = stock - selectedQuantity;
-    updatestock(stock);
+    updatestock(stock - selectedQuantity);
     setSelectedQuantity(1);
   };
 
@@ -57,8 +64,7 @@ export default function ProductPage({ params: { id } }: ProductPageProps) {
           />
           <p className="text-gray-700 mb-6">{newp.description}</p>
           <p className="text-gray-600 mb-6">
-            In stock:{' '}
-            <span className="font-medium">{stock - selectedQuantity}</span> ชิ้น
+            In stock: <span className="font-medium">{stock - selectedQuantity}</span> ชิ้น
           </p>
           <AddToCartButton
             productId={newp.id}

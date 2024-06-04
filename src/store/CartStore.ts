@@ -1,8 +1,8 @@
 // types.ts
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { UserStore } from './UserStore';
-import {syncCartWithBackend } from '@/utils/syncCartWithBackend'
+
+
 export interface Product {
     id: string;
     productName: string;
@@ -15,7 +15,7 @@ export interface Product {
     category: string;
   }
 
-export interface CartState {
+export interface CartStore {
     cart: Product[];
     addToCart: (product: Product) => void;
     createOrder: () => Promise<void>;
@@ -23,9 +23,9 @@ export interface CartState {
   }
   
   // Create the store with persist middleware
-  export const CartState = create(
-    persist<CartState>(
-      (set,get) => ({
+  export const CartStore = create(
+    persist<CartStore>(
+      (set) => ({
         cart: [],
         addToCart: (product: Product) => {
           set(state => {
@@ -45,9 +45,6 @@ export interface CartState {
             } else {
               // Product does not exist, add to cart
               return { cart: [...state.cart, product] };
-            }
-            if (UserStore.getState().isAuthenticated) {
-                syncCartWithBackend(get().cart)
             }
           });
         },

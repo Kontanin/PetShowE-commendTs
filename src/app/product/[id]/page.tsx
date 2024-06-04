@@ -3,9 +3,10 @@ import { useState, useEffect } from 'react';
 import products from './mockData.json';
 import Image from 'next/image';
 import AddToCartButton from '../../../components/ProductCart/AddToCartButton';
-import PriceTag from '@/components/PriceTag';
-import { CartState } from '@/store/CartStore';
-
+import PriceTag from '@/components/Productslice/PriceTag';
+import { CartStore } from '@/store/CartStore';
+import { UserStore } from '@/store/UserStore';
+import {syncCartWithBackend } from '@/utils/syncCartWithBackend'
 interface ProductPageProps {
   params: {
     id: string;
@@ -15,8 +16,11 @@ interface ProductPageProps {
 export default function ProductPage({ params: { id } }: ProductPageProps) {
   const [selectedQuantity, setSelectedQuantity] = useState(1);
   const [stock, updatestock] = useState(0);
+  const { isAuthenticated } = UserStore();
+
   const newp = products.find(product => product.id === id);
-  const addToCart = CartState(state => state.addToCart);
+ 
+  const addToCart = CartStore(state => state.addToCart);
 
   useEffect(() => {
     if (newp) {
@@ -40,6 +44,9 @@ export default function ProductPage({ params: { id } }: ProductPageProps) {
     newp.stock = stock - selectedQuantity;
     updatestock(stock - selectedQuantity);
     setSelectedQuantity(1);
+    if (isAuthenticated) {
+      syncCartWithBackend(CartStore.getState().cart);
+    }
   };
 
   return (

@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import FormSubmitButton from '@/components/FormSubmitButton';
+import FormSubmitButton from '@/components/Form/FormSubmitButton';
 import { Textarea, Input } from '@nextui-org/input';
 import { Select, SelectItem } from '@nextui-org/react';
 

@@ -1,8 +1,8 @@
 'use client';
 import React from 'react';
 import api from './mockData.json';
-import SliderCp from '@/components/SliderCp';
-import CardCom from '@/components/card';
+import SliderCp from '@/components/Home/SliderCp';
+import CardCom from '@/components/Home/card';
 
 export default function Home() {
   return (

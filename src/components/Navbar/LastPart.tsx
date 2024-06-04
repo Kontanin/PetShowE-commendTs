@@ -1,4 +1,4 @@
-import React from 'react';
+import React ,{useState,useEffect} from 'react';
 import {
   NavbarContent,
   NavbarItem,
@@ -14,10 +14,16 @@ import { FaUserCircle } from 'react-icons/fa';
 import Cookies from 'js-cookie';
 import CartOrder from '@/components/CartIcon/CartOrder';
 import { UserStore } from '@/store/UserStore';
-import { CartState } from '@/store/CartStore';
+import { CartStore } from '@/store/CartStore';
 export default function Lastpart() {
-  const Order = CartState(state => state.cart);
-  const { isAuthenticated, setIsAuthenticated } = UserStore();
+  const Order = CartStore(state => state.cart);
+  const {  isAuthenticated,setIsAuthenticated,role } = UserStore();
+  const [ permissions,setPermissions ] = useState(false)
+  useEffect(()=>{
+    if(isAuthenticated&&role=='admin'){
+      setPermissions(true)
+    }
+  },[role,permissions,isAuthenticated])
   const handleLogout = () => {
     setIsAuthenticated(false);
     Cookies.remove('token'); // Assuming 'token' is the name of your authentication cookie
@@ -66,6 +72,19 @@ export default function Lastpart() {
             >
               Settings
             </Link>
+            <Link
+              href="/help&feedback"
+              className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded"
+            >
+              help&feedback
+            </Link>
+            {permissions&&
+            <Link
+              href="/admin"
+              className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded"
+            >
+            admin
+            </Link>}
             <p
               onClick={handleLogout}
               className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded"

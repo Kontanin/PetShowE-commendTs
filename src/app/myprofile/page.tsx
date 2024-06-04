@@ -14,7 +14,7 @@ function MyProfile() {
 
       <img
         className="w-64 h-64 overflow-hidden mx-auto mb-4 rounded-full shadow-lg"
-        src="/mypic.jpg"
+        src="@/profile/mypic.jpg"
       />
 
       <h3 className="text-xl font-semibold mb-2">Josh do</h3>

@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import FormSubmitButton from '@/components/FormSubmitButton';
+import FormSubmitButton from '@/components/Form/FormSubmitButton';
 
 export default function AddProductPage() {
   const [file, setFile] = useState<File | null>(null);

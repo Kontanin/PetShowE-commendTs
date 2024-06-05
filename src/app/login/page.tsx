@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-
+import { LoginSchema } from '@/utils/schemas';
 import { UserStore } from '@/store/UserStore';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
@@ -12,11 +12,6 @@ import InputWithLabel from '@/components/Form/InputWithLabel';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Cookies from 'js-cookie';
 import { ClipLoader } from 'react-spinners';
-
-const LoginSchema = z.object({
-  email: z.string().email(),
-  password: z.string(),
-});
 
 function Login() {
   const { setUser, setIsAuthenticated } = UserStore();

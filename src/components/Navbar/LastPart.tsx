@@ -105,7 +105,7 @@ export default function Lastpart() {
           </NavbarItem>
           <Button
             as={Link}
-            href=""
+            href="/signup"
             className="bg-yellow-500 text-black hover:bg-yellow-600 rounded-full px-4 py-2"
           >
             Sign Up

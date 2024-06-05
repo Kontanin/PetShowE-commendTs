@@ -1,24 +1,20 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useUserStore } from '@/store/zustand';
+import { LoginSchema } from '@/utils/schemas';
+import { UserStore } from '@/store/UserStore';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
-import doPostRequest from '@/components/req/req';
+import doPostRequest from '@/utils/doPostRequest';
 import { z } from 'zod';
-import InputWithLabel from '@/components/InputWithLabel';
+import InputWithLabel from '@/components/Form/InputWithLabel';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Cookies from 'js-cookie';
 import { ClipLoader } from 'react-spinners';
 
-const LoginSchema = z.object({
-  email: z.string().email(),
-  password: z.string(),
-});
-
 function Login() {
-  const { setUser, setIsAuthenticated } = useUserStore();
+  const { setUser, setIsAuthenticated } = UserStore();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -30,13 +26,11 @@ function Login() {
 
   const onhandle = async (data: any) => {
     setIsLoading(true);
-    console.log('login');
+
     let result = await doPostRequest(data, '/api/login');
-    console.log(result, 'loginasdf');
 
     if (result.token) {
       Cookies.set('authToken', result.token, { expires: 7 });
-      console.log('login', result.token, Cookies.get('authToken'));
       setUser(result);
       setIsAuthenticated(true);
       router.push('/');

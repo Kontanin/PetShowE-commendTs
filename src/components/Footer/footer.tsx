@@ -1,13 +1,14 @@
 'use client';
 import React from 'react';
 import CardFooter from './cardFooter';
-import ChatBox from '@/components/Chatbox/ChatBox';
-import { useUserStore } from '@/store/zustand';
+// import ChatBox from '@/components/Chatbox/ChatBox';
+import { UserStore } from '@/store/UserStore';
 export default function Footer() {
-  const { isAuthenticated } = useUserStore();
+  const { isAuthenticated } = UserStore();
+  console.log(isAuthenticated,"authentication")
   return (
     <div>
-      {isAuthenticated && <ChatBox></ChatBox>}
+      {/* {isAuthenticated && <ChatBox></ChatBox>} */}
       <CardFooter></CardFooter>
     </div>
   );

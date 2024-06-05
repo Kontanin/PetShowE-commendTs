@@ -1,9 +1,16 @@
-// utils/schemas.ts
-import { z } from 'zod';
+import axios from 'axios';
 
-export const LoginSchema = z.object({
-  email: z.string().email({ message: "Invalid email address" }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters long" }),
-});
+async function doPostRequest(payload: string, path: string) {
+  console.log(payload, 'payload');
+  try {
+    const res = await axios.post(path, payload);
+    const body = res.data;
 
-export type LoginFormInputs = z.infer<typeof LoginSchema>;
+    return body;
+  } catch (e) {
+    console.log(e, 'error');
+    return false;
+  }
+}
+
+export default doPostRequest;

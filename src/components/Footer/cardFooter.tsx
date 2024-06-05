@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { ListboxWrapper } from '@/components/ListboxWrapper';
+import { ListboxWrapper } from '@/components/Footer/ListboxWrapper';
 import ItemContainer from './itemContainer';
 export default function CardFooter() {
   return (

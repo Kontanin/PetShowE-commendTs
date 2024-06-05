@@ -1,5 +1,6 @@
 'use client';
 import React, { useState } from 'react';
+import { validateStep1,validateStep2,validateStep3} from '@/components/Singup/Validation';
 
 const SignUp = () => {
   const [step, setStep] = useState(1);
@@ -15,6 +16,8 @@ const SignUp = () => {
     zipcode: '',
   });
 
+  const [errors, setErrors] = useState<any>({});
+
   const handleChange = (e: any) => {
     setFormData({
       ...formData,
@@ -22,13 +25,30 @@ const SignUp = () => {
     });
   };
 
+  const validateStep = () => {
+    let validation: { valid: boolean; errors: any } = { valid: true, errors: {} };
+    if (step === 1) {
+      validation = validateStep1(formData);
+    } else if (step === 2) {
+      validation = validateStep2(formData);
+    } else if (step === 3) {
+      validation = validateStep3(formData);
+    }
+
+    if (validation.valid) {
+      setErrors({});
+      return true;
+    } else {
+      setErrors(validation.errors);
+      return false;
+    }
+  };
+
   const nextStep = (e: any) => {
     e.preventDefault();
-    if (step === 1 && (!formData.firstname || !formData.lastname)) {
-      alert('Please fill in all required fields.');
-      return;
+    if (validateStep()) {
+      setStep(step + 1);
     }
-    setStep(step + 1);
   };
 
   const prevStep = (e: any) => {
@@ -38,12 +58,9 @@ const SignUp = () => {
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match.');
-      return;
+    if (validateStep()) {
+      console.log('Form submitted', formData);
     }
-    // Handle form submission
-    console.log('Form submitted', formData);
   };
 
   return (

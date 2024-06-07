@@ -1,9 +1,9 @@
 // pages/index.tsx or pages/cat.tsx (wherever you want to use it)
-'use client';
+"use client";
 import { NextPage } from 'next';
 import React, { useState, useEffect } from 'react';
-import FilterSidebar from '@/components/Productslice/FilterSidebar';
-import ProductGrid from '@/components/Productslice/ProductGrid';
+import FilterSidebar from '@/components/productslice/FilterSidebar';
+import ProductGrid from '@/components/productslice/ProductGrid';
 import { usePathname, useSearchParams } from 'next/navigation';
 
 interface Product {
@@ -69,7 +69,7 @@ const products: Product[] = [
     description: 'exotic detail',
     quantity: 3,
     unitPrice: 35.0,
-    image: '/path/to/image5.png',
+    image: '/product/5.jpg',
     freeShipping: true,
     company: 'Exotic Foods Inc',
     category: 'Exotic',

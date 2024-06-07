@@ -1,6 +1,6 @@
-// components/Productslice/FilterSidebar.tsx
 import React, { useState, useEffect } from 'react';
 import { toSlug } from '@/utils/slug';
+import {SearchStore} from '@/store/SearchStore';
 
 interface FilterSidebarProps {
   filters: string[];
@@ -19,12 +19,25 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
   search,
   onSearchChange,
 }) => {
-  const [localPriceRange, setLocalPriceRange] =
-    useState<[number, number]>(priceRange);
+  const [localPriceRange, setLocalPriceRange] = useState<[number, number]>(priceRange);
+  const { searchHistory, addSearchTerm } = SearchStore();
+  const [suggestions, setSuggestions] = useState<string[]>([]);
 
   useEffect(() => {
     setLocalPriceRange(priceRange);
   }, [priceRange]);
+
+  useEffect(() => {
+    if (search) {
+      setSuggestions(
+        searchHistory.filter((item) =>
+          item.toLowerCase().includes(search.toLowerCase())
+        )
+      );
+    } else {
+      setSuggestions([]);
+    }
+  }, [search, searchHistory]);
 
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const filter = event.target.value;
@@ -50,17 +63,50 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
     onSearchChange(event.target.value);
   };
 
+  const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (search && !searchHistory.includes(search)) {
+      addSearchTerm(search);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion: string) => {
+    onSearchChange(suggestion);
+    setSuggestions([]);
+  };
+
   return (
     <div className="p-4">
-      <div>
+      <div className="relative">
         <h3 className="font-bold mb-2">Search</h3>
-        <input
-          type="text"
-          value={search}
-          onChange={handleSearchChange}
-          placeholder="Search product name"
-          className="w-full h-10 border border-gray-300 rounded"
-        />
+        <form onSubmit={handleSearchSubmit} className="flex">
+          <input
+            type="text"
+            value={search}
+            onChange={handleSearchChange}
+            placeholder="Search product name"
+            className="w-full h-10 border border-gray-300 rounded-l mb-10"
+          />
+          <button
+            type="submit"
+            className="p-2 bg-orange-500 text-white rounded-r h-10 hover:bg-blue-600 focus:outline-none"
+          >
+            Search
+          </button>
+        </form>
+        {suggestions.length > 0 && (
+          <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-lg mt-1">
+            {suggestions.map((suggestion, index) => (
+              <li
+                key={index}
+                onClick={() => handleSuggestionClick(suggestion)}
+                className="p-2 cursor-pointer hover:bg-gray-200"
+              >
+                {suggestion}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
       <div>
         <h3 className="font-bold mb-2">Price Range</h3>

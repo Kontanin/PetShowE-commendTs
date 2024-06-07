@@ -28,12 +28,12 @@ const SignUp = () => {
     formState: { errors },
   } = methods;
 
-  const nextStep = (e: any) => {
+  const nextStep = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setStep(step + 1);
   };
 
-  const prevStep = (e: any) => {
+  const prevStep = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setStep(step - 1);
   };

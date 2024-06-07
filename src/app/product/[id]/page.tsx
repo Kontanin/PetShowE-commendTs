@@ -1,9 +1,9 @@
-'use client';
+"use client"
 import { useState, useEffect } from 'react';
 import products from './mockData.json';
 import Image from 'next/image';
 import AddToCartButton from '../../../components/ProductCart/AddToCartButton';
-import PriceTag from '@/components/Productslice/PriceTag';
+import PriceTag from '@/components/productslice/PriceTag';
 import { CartStore } from '@/store/CartStore';
 import { UserStore } from '@/store/UserStore';
 import {syncCartWithBackend } from '@/utils/syncCartWithBackend'

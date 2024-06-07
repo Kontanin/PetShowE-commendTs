@@ -48,7 +48,6 @@ export interface CartStore {
             }
           });
         },
-  
         createOrder: async () => {},
         clearCart: () => {
           set({ cart: [] });

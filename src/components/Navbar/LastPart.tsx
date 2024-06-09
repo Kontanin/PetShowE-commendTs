@@ -1,4 +1,4 @@
-import React ,{useState,useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   NavbarContent,
   NavbarItem,
@@ -15,15 +15,16 @@ import Cookies from 'js-cookie';
 import CartOrder from '@/components/CartIcon/CartOrder';
 import { UserStore } from '@/store/UserStore';
 import { CartStore } from '@/store/CartStore';
+
 export default function Lastpart() {
   const Order = CartStore(state => state.cart);
-  const {  isAuthenticated,setIsAuthenticated,role } = UserStore();
-  const [ permissions,setPermissions ] = useState(false)
-  useEffect(()=>{
-    if(isAuthenticated&&role=='admin'){
-      setPermissions(true)
+  const { isAuthenticated, setIsAuthenticated, role } = UserStore();
+  const [permissions, setPermissions] = useState(false);
+  useEffect(() => {
+    if (isAuthenticated && role == 'admin') {
+      setPermissions(true);
     }
-  },[role,permissions,isAuthenticated])
+  }, [role, permissions, isAuthenticated]);
   const handleLogout = () => {
     setIsAuthenticated(false);
     Cookies.remove('token'); // Assuming 'token' is the name of your authentication cookie
@@ -51,7 +52,7 @@ export default function Lastpart() {
         </PopoverContent>
       </Popover>
 
-      {isAuthenticated? (
+      {isAuthenticated ? (
         <Popover placement="bottom">
           <PopoverTrigger>
             <Button className="flex items-center space-x-2 bg-transparent hover:bg-gray-200 rounded-full p-2">
@@ -78,13 +79,14 @@ export default function Lastpart() {
             >
               help&feedback
             </Link>
-            {permissions&&
-            <Link
-              href="/admin"
-              className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded"
-            >
-            admin
-            </Link>}
+            {permissions && (
+              <Link
+                href="/admin"
+                className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded"
+              >
+                admin
+              </Link>
+            )}
             <p
               onClick={handleLogout}
               className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded"

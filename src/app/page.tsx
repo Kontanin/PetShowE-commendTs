@@ -3,8 +3,8 @@ import React from 'react';
 
 import SliderCp from '@/components/Home/SliderCp';
 import CardCom from '@/components/Home/card';
-import DiscountAd from './tes/page';
-
+import PetShopHero from './tes/page';
+import DiscountAd from '@/components/Discount/Discount';
 export default function Home() {
   const api = [
     {
@@ -48,8 +48,9 @@ export default function Home() {
   return (
     <div>
       <div>
-        <div>
+        <div> 
           <DiscountAd></DiscountAd>
+      <PetShopHero></PetShopHero>
         </div>
 
         <h1 className="pl-2">Popular proudct</h1>

@@ -1,36 +1,26 @@
 'use client';
 import React from 'react';
-import Link from 'next/link';
+import AdminSidebar from './AdminSidebar';
+import SimpleLineChart from './SimpleLineChart';
+import OrderStatusChart from './OrderStatusChart';
 
-const AdminSidebar: React.FC = () => {
+const AdminDashboard: React.FC = () => {
   return (
-    <nav className="w-1/4 bg-gray-800 text-white p-6">
-      <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
-      <ul>
-        <li className="mb-4">
-          <Link href="/admin/users">
-            <div className="block py-2 px-4 hover:bg-grdivy-700 rounded">
-              User Management
-            </div>
-          </Link>
-        </li>
-        <li className="mb-4">
-          <Link href="/admin/products">
-            <div className="block py-2 px-4 hover:bg-gray-700 rounded">
-              Product Management
-            </div>
-          </Link>
-        </li>
-        <li className="mb-4">
-          <Link href="/admin/orders">
-            <div className="block py-2 px-4 hover:bg-gray-700 rounded">
-              Order Management
-            </div>
-          </Link>
-        </li>
-      </ul>
-    </nav>
+    <div className="flex min-h-screen bg-gray-100">
+      <AdminSidebar />
+      <main className="flex-1 p-6">
+        <h1 className="text-3xl font-bold mb-6 text-yellow-500">Welcome to the Admin Dashboard</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="col-span-1 md:col-span-2 lg:col-span-3">
+            <OrderStatusChart />
+          </div>
+          <div className="col-span-1 md:col-span-2 lg:col-span-3">
+            <SimpleLineChart />
+          </div>
+        </div>
+      </main>
+    </div>
   );
 };
 
-export default AdminSidebar;
+export default AdminDashboard;

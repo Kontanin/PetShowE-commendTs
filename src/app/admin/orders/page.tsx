@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-
+import {Breadcrumbs, BreadcrumbItem} from "@nextui-org/react";
 type Order = {
   id: string;
   shippingFee?: boolean;
@@ -67,6 +67,10 @@ const OrderManagement: React.FC = () => {
   return (
     <div>
       <h2 className="text-3xl font-bold mb-6">Order Management</h2>
+      <Breadcrumbs>
+      <BreadcrumbItem>Admin</BreadcrumbItem>
+      <BreadcrumbItem>Orders</BreadcrumbItem>
+    </Breadcrumbs>
       <table className="min-w-full bg-white">
         <thead>
           <tr>

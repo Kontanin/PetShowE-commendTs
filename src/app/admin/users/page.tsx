@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-
+import {Breadcrumbs, BreadcrumbItem} from "@nextui-org/react";
 const UserManagement: React.FC = () => {
   const users = [
     { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin' },
@@ -25,6 +25,12 @@ const UserManagement: React.FC = () => {
 
   return (
     <div>
+
+      <Breadcrumbs>
+      <BreadcrumbItem>Admin</BreadcrumbItem>
+      <BreadcrumbItem>Users</BreadcrumbItem>
+    </Breadcrumbs>
+
       <h2 className="text-3xl font-bold mb-6">User Management</h2>
       <table className="min-w-full bg-white">
         <thead>

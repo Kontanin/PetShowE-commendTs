@@ -1,6 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import FormSubmitButton from '@/components/Form/FormSubmitButton';
+import {Breadcrumbs, BreadcrumbItem} from "@nextui-org/react";
 
 export default function AddProductPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -22,7 +23,11 @@ export default function AddProductPage() {
 
   return (
     <div>
-      <h1 className="mb-3 text-lg font-bold">Add Product</h1>
+
+    <Breadcrumbs>
+      <BreadcrumbItem>Admin Pages</BreadcrumbItem>
+      <BreadcrumbItem>Products</BreadcrumbItem>
+    </Breadcrumbs>
       <form onSubmit={handle}>
         <input
           required

@@ -1,5 +1,5 @@
-"use client"
-import { useState } from "react";
+'use client';
+import { useState } from 'react';
 
 export const AddressEdit = () => {
   const [formData, setFormData] = useState({
@@ -8,11 +8,10 @@ export const AddressEdit = () => {
     country: '',
     zipcode: '',
     city: '',
-    state: '',
     phone: '',
   });
 
-  const handleChange = (e:any) => {
+  const handleChange = (e: any) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -20,18 +19,24 @@ export const AddressEdit = () => {
     });
   };
 
-  const handleSubmit = (e :any) => {
+  const handleSubmit = (e: any) => {
     e.preventDefault();
     console.log('Form submitted:', formData);
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full ">
-        <h2 className="text-2xl font-bold mb-6 text-center">Sign Up</h2>
-        <form onSubmit={handleSubmit}>
+    <div className="flex justify-start items-center  bg-gray-100">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl p-8">
+        <h2 className="text-2xl font-bold mb-6 text-center">My Adress</h2>
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        >
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="address">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="address"
+            >
               Address
             </label>
             <input
@@ -44,7 +49,10 @@ export const AddressEdit = () => {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="subdistrict">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="subdistrict"
+            >
               Subdistrict
             </label>
             <input
@@ -57,7 +65,10 @@ export const AddressEdit = () => {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="country">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="country"
+            >
               Country
             </label>
             <input
@@ -70,7 +81,10 @@ export const AddressEdit = () => {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="zipcode">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="zipcode"
+            >
               Zipcode
             </label>
             <input
@@ -83,7 +97,10 @@ export const AddressEdit = () => {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="city">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="city"
+            >
               City
             </label>
             <input
@@ -95,21 +112,11 @@ export const AddressEdit = () => {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg"
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="state">
-              State
-            </label>
-            <input
-              type="text"
-              id="state"
-              name="state"
-              value={formData.state}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phone">
+          <div className="md:col-span-2">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="phone"
+            >
               Phone
             </label>
             <input
@@ -121,24 +128,12 @@ export const AddressEdit = () => {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg"
             />
           </div>
-          <div className="flex justify-between">
-            <button
-              type="button"
-              className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-700"
-            >
-              Previous
-            </button>
+          <div className="md:col-span-2 flex justify-center">
             <button
               type="submit"
               className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
             >
               Save Changes
-            </button>
-            <button
-              type="button"
-              className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-700"
-            >
-              Skip
             </button>
           </div>
         </form>
@@ -146,6 +141,3 @@ export const AddressEdit = () => {
     </div>
   );
 };
-
-
-

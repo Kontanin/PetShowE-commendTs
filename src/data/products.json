@@ -1,0 +1,79 @@
+[
+  {
+    "id": "B3-92-BD-33-BA-DA",
+    "productName": "Lentibulariaceae",
+    "description": "random detail",
+    "quantity": 1,
+    "unitPrice": 354,
+    "image": "/product/1.jpg",
+    "freeShipping": true,
+    "company": "Sporer-Gerlach",
+    "category": "Bird"
+  },
+  {
+    "id": "B4-93-BE-34-CA-DB",
+    "productName": "Product B",
+    "description": "another detail",
+    "quantity": 5,
+    "unitPrice": 200,
+    "image": "/product/2.jpg",
+    "freeShipping": false,
+    "company": "Example Corp",
+    "category": "Cat"
+  },
+  {
+    "id": "C5-94-CF-35-DA-EC",
+    "productName": "Product C",
+    "description": "some detail",
+    "quantity": 10,
+    "unitPrice": 150,
+    "image": "/product/3.jpg",
+    "freeShipping": true,
+    "company": "Sample Inc",
+    "category": "Dog"
+  },
+  {
+    "id": "D6-95-DF-36-EB-FD",
+    "productName": "Product D",
+    "description": "different detail",
+    "quantity": 7,
+    "unitPrice": 220,
+    "image": "/product/4.jpg",
+    "freeShipping": false,
+    "company": "Test LLC",
+    "category": "Water-Animal"
+  },
+  {
+    "id": "E7-96-EF-37-FC-GE",
+    "productName": "Exotic Animal Food E",
+    "description": "exotic detail",
+    "quantity": 3,
+    "unitPrice": 35.0,
+    "image": "/product/5.jpg",
+    "freeShipping": true,
+    "company": "Exotic Foods Inc",
+    "category": "Exotic"
+  },
+  {
+    "id": "F8-97-GF-38-HD-HI",
+    "productName": "Product F",
+    "description": "another detail",
+    "quantity": 2,
+    "unitPrice": 175,
+    "image": "/product/6.jpg",
+    "freeShipping": true,
+    "company": "Example Corp",
+    "category": "Cat"
+  },
+  {
+    "id": "G9-98-HG-39-IJ-JK",
+    "productName": "Product G",
+    "description": "some other detail",
+    "quantity": 4,
+    "unitPrice": 400,
+    "image": "/product/7.jpg",
+    "freeShipping": false,
+    "company": "Sporer-Gerlach",
+    "category": "Bird"
+  }
+]

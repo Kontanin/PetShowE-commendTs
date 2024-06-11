@@ -1,4 +1,3 @@
-// stores/searchStore.ts
 import create from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
@@ -8,28 +7,40 @@ interface SearchState {
   clearSearchHistory: () => void;
 }
 
-export  const SearchStore = create(
+export const SearchStore = create(
   persist<SearchState>(
-  (set) => ({
-    searchHistory: JSON.parse(localStorage.getItem('searchHistory') || '[]'),
-      addSearchTerm:(term:string) =>{
-        set((state)=>{
+    (set) => ({
+      searchHistory: [],
+      addSearchTerm: (term: string) => {
+        set((state) => {
           const updatedHistory = [term, ...state.searchHistory];
-          localStorage.setItem('searchHistory', JSON.stringify(updatedHistory));
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('searchHistory', JSON.stringify(updatedHistory));
+          }
           return { searchHistory: updatedHistory };
-        }
-        )
-      }
-      ,  clearSearchHistory: () =>{
-        set({searchHistory:[]})
-      }
-}) 
-  ,{
-    name: 'cartStore',
-    storage: createJSONStorage(() => localStorage),
-  }
-)
-)
+        });
+      },
+      clearSearchHistory: () => {
+        set(() => {
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('searchHistory', '[]');
+          }
+          return { searchHistory: [] };
+        });
+      },
+    }),
+    {
+      name: 'searchStore',
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
+);
+
+// Initialize search history from localStorage on the client side
+if (typeof window !== 'undefined') {
+  const initialSearchHistory = JSON.parse(localStorage.getItem('searchHistory') || '[]');
+  SearchStore.setState({ searchHistory: initialSearchHistory });
+}
 
 
 

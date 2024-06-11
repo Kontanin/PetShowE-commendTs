@@ -8,7 +8,6 @@ export const AddressEdit = () => {
     country: '',
     zipcode: '',
     city: '',
-    phone: '',
   });
 
   const handleChange = (e: any) => {
@@ -25,14 +24,11 @@ export const AddressEdit = () => {
   };
 
   return (
-    <div className="flex justify-start items-center  bg-gray-100">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl p-8">
-        <h2 className="text-2xl font-bold mb-6 text-center">My Adress</h2>
-        <form
-          onSubmit={handleSubmit}
-          className="grid grid-cols-1 md:grid-cols-2 gap-6"
-        >
-          <div className="mb-4">
+    <div className="flex justify-start items-center bg-gray-100 rounded-lg">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-full p-8">
+        <h2 className="text-2xl font-bold mb-6 text-center">My Address</h2>
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="md:col-span-2 mb-4">
             <label
               className="block text-gray-700 text-sm font-bold mb-2"
               htmlFor="address"
@@ -108,22 +104,6 @@ export const AddressEdit = () => {
               id="city"
               name="city"
               value={formData.city}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-            />
-          </div>
-          <div className="md:col-span-2">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="phone"
-            >
-              Phone
-            </label>
-            <input
-              type="text"
-              id="phone"
-              name="phone"
-              value={formData.phone}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg"
             />

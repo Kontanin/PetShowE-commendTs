@@ -6,7 +6,8 @@ export const ProfileEdit = () => {
     name: 'John Doe',
     email: 'john.doe@example.com',
     bio: 'Software developer at XYZ Company.',
-    picture: '' // Initial picture URL or base64 string
+    picture: '', // Initial picture URL or base64 string
+    phone: '', // Initial phone number
   };
 
   const [profile, setProfile] = useState(initialProfile);
@@ -19,7 +20,8 @@ export const ProfileEdit = () => {
       profile.name !== initialProfile.name ||
       profile.email !== initialProfile.email ||
       profile.bio !== initialProfile.bio ||
-      profile.picture !== initialProfile.picture;
+      profile.picture !== initialProfile.picture ||
+      profile.phone !== initialProfile.phone;
 
     setIsChanged(hasChanges);
   }, [profile]);
@@ -92,6 +94,19 @@ export const ProfileEdit = () => {
               id="bio"
               name="bio"
               value={profile.bio}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phone">
+              Phone
+            </label>
+            <input
+              type="text"
+              id="phone"
+              name="phone"
+              value={profile.phone}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg"
             />

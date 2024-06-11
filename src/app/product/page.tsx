@@ -1,10 +1,11 @@
-// pages/index.tsx or pages/cat.tsx (wherever you want to use it)
-"use client";
-import { NextPage } from 'next';
-import React, { useState, useEffect } from 'react';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { usePathname, useSearchParams } from 'next/navigation';
 import FilterSidebar from '@/components/productslice/FilterSidebar';
 import ProductGrid from '@/components/productslice/ProductGrid';
-import { usePathname, useSearchParams } from 'next/navigation';
+import products from '@/data/products.json';
+import promotions from '@/data/promotions.json';
 
 interface Product {
   id: string;
@@ -18,73 +19,23 @@ interface Product {
   category: string;
 }
 
-const products: Product[] = [
-  {
-    id: 'B3-92-BD-33-BA-DA',
-    productName: 'Lentibulariaceae',
-    description: 'random detail',
-    quantity: 1,
-    unitPrice: 354,
-    image: '/product/1.jpg',
-    freeShipping: true,
-    company: 'Sporer-Gerlach',
-    category: 'Bird',
-  },
-  {
-    id: 'B4-93-BE-34-CA-DB',
-    productName: 'Product B',
-    description: 'another detail',
-    quantity: 5,
-    unitPrice: 200,
-    image: '/product/2.jpg',
-    freeShipping: false,
-    company: 'Example Corp',
-    category: 'Cat',
-  },
-  {
-    id: 'C5-94-CF-35-DA-EC',
-    productName: 'Product C',
-    description: 'some detail',
-    quantity: 10,
-    unitPrice: 150,
-    image: '/product/3.jpg',
-    freeShipping: true,
-    company: 'Sample Inc',
-    category: 'Dog',
-  },
-  {
-    id: 'D6-95-DF-36-EB-FD',
-    productName: 'Product D',
-    description: 'different detail',
-    quantity: 7,
-    unitPrice: 220,
-    image: '/product/4.jpg',
-    freeShipping: false,
-    company: 'Test LLC',
-    category: 'Water-Animal',
-  },
-  {
-    id: 'E7-96-EF-37-FC-GE',
-    productName: 'Exotic Animal Food E',
-    description: 'exotic detail',
-    quantity: 3,
-    unitPrice: 35.0,
-    image: '/product/5.jpg',
-    freeShipping: true,
-    company: 'Exotic Foods Inc',
-    category: 'Exotic',
-  },
-];
+interface Promotion {
+  id: number;
+  name: string;
+  type: string;
+  targets: string[];
+  percentage?: number;
+  startDate: string;
+  endDate: string;
+}
 
-const Home: NextPage = () => {
+const Home: React.FC = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get('category');
   const searchQuery = searchParams.get('search') || '';
 
-  const [filters, setFilters] = useState<string[]>(
-    categoryParam ? categoryParam.split('&&') : [],
-  );
+  const [filters, setFilters] = useState<string[]>(categoryParam ? categoryParam.split('&&') : []);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 500]);
   const [search, setSearch] = useState<string>(searchQuery);
 
@@ -107,6 +58,10 @@ const Home: NextPage = () => {
     window.history.pushState({}, '', url);
   };
 
+  const checkPromotions = (productId: string): Promotion[] => {
+    return promotions.filter(promo => promo.targets.includes(productId));
+  };
+
   return (
     <div>
       <div className="flex">
@@ -126,6 +81,7 @@ const Home: NextPage = () => {
             priceRange={priceRange}
             products={products}
             search={search}
+            checkPromotions={checkPromotions}
           />
         </div>
       </div>

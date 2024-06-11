@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toSlug } from '@/utils/slug';
-import {SearchStore} from '@/store/SearchStore';
+import { SearchStore } from '@/store/SearchStore';
+import { Slider } from '@nextui-org/react';
 
 interface FilterSidebarProps {
   filters: string[];
@@ -52,11 +53,12 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
     onFilterChange(newFilters);
   };
 
-  const handlePriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(event.target.value, 10);
-    const newPriceRange = [localPriceRange[0], value] as [number, number];
-    setLocalPriceRange(newPriceRange);
-    onPriceChange(newPriceRange);
+  const handlePriceChange = (value: number | number[]) => {
+    if (Array.isArray(value)) {
+      const newPriceRange = [value[0], value[1]] as [number, number];
+      setLocalPriceRange(newPriceRange);
+      onPriceChange(newPriceRange);
+    }
   };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -110,12 +112,11 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
       </div>
       <div>
         <h3 className="font-bold mb-2">Price Range</h3>
-        <input
-          type="range"
-          min="0"
-          max="500"
-          value={localPriceRange[1]}
-          className="w-full"
+        <Slider
+          minValue={priceRange[0]}
+          maxValue={priceRange[1]}
+          value={localPriceRange}
+          step={1}
           onChange={handlePriceChange}
         />
         <div className="flex justify-between">

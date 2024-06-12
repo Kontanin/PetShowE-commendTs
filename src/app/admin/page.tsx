@@ -1,8 +1,8 @@
 'use client';
 import React from 'react';
-import AdminSidebar from './AdminSidebar';
-import SimpleLineChart from './SimpleLineChart';
-import OrderStatusChart from './OrderStatusChart';
+import AdminSidebar from '../../components/Admin/AdminSidebar';
+import SimpleLineChart from '../../components/Admin/SimpleLineChart';
+import OrderStatusChart from '../../components/Admin/OrderStatusChart';
 
 const AdminDashboard: React.FC = () => {
   return (

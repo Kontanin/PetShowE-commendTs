@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import PromotionForm from '@/components/Marketing/PromotionForm';
-import PromotionList from '@/components/Marketing/PromotionList';
-import { Promotion, PromotionType, Product } from '@/components/Marketing/types';
+import PromotionForm from '@/components/Promotion/PromotionForm';
+import PromotionList from '@/components/Promotion/PromotionList';
+import { Promotion, PromotionType} from '@/types/promotionTypes';
 
 // Import JSON files
 import productsData from '@/data/products.json';

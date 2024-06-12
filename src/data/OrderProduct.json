@@ -1,0 +1,36 @@
+[
+    {
+      "id": "1",
+      "productName": "MARNI",
+      "description": "Blue Trunk Bag in Buffalo",
+      "quantity": 1,
+      "unitPrice": 2150.0,
+      "image": "/path/to/marni-bag.jpg",
+      "freeShipping": false,
+      "company": "Marni",
+      "category": "Bag"
+    },
+    {
+      "id": "2",
+      "productName": "COMMON PROJECTS",
+      "description": "White Achilles Retro Low Sneaker",
+      "quantity": 1,
+      "unitPrice": 485.0,
+      "image": "/path/to/common-projects.jpg",
+      "freeShipping": true,
+      "company": "Ssense",
+      "category": "Shoes"
+    },
+    {
+      "id": "3",
+      "productName": "MAJE",
+      "description": "ECLARE Ethnic Poncho",
+      "quantity": 1,
+      "unitPrice": 220.0,
+      "image": "/path/to/maje-poncho.jpg",
+      "freeShipping": true,
+      "company": "Maje",
+      "category": "Clothing"
+    }
+  ]
+  

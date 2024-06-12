@@ -13,6 +13,7 @@ import {
 import { UserForm } from '@/components/SingUp/UserFrom';
 import { AddressForm } from '@/components/SingUp/AddressFrom';
 import { AccountForm } from '@/components/SingUp/AccountFrom';
+import FormSubmitButton from '@/components/Form/FormSubmitButton';
 
 const SignUp = () => {
   const [step, setStep] = useState(1);
@@ -57,7 +58,7 @@ const SignUp = () => {
             {step === 3 && (
               <AccountForm errors={errors as FieldErrors<Step3Errors>} />
             )}
-            <div className="flex justify-between mt-4">
+            <div className={`flex ${step === 1 ? 'justify-end' : 'justify-between'} mt-4`}>
               {step > 1 && (
                 <button
                   className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
@@ -76,12 +77,9 @@ const SignUp = () => {
                   Next
                 </button>
               ) : (
-                <button
-                  className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                  type="submit"
-                >
+                <FormSubmitButton className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                   Submit
-                </button>
+                </FormSubmitButton>
               )}
             </div>
           </form>

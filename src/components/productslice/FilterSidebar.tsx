@@ -113,8 +113,8 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
       <div>
         <h3 className="font-bold mb-2">Price Range</h3>
         <Slider
-          minValue={priceRange[0]}
-          maxValue={priceRange[1]}
+          minValue={0}
+          maxValue={500}
           value={localPriceRange}
           step={1}
           onChange={handlePriceChange}
@@ -166,9 +166,9 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
           <input
             type="checkbox"
             id="water-animal"
-            value={toSlug('Water-animal')}
+            value={toSlug('WaterAnimal')}
             onChange={handleFilterChange}
-            checked={filters.includes(toSlug('Water-animal'))}
+            checked={filters.includes(toSlug('WaterAnimal'))}
           />
           <label htmlFor="water-animal" className="ml-2">
             Water Animal

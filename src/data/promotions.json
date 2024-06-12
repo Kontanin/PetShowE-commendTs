@@ -1,38 +1,36 @@
 [
   {
-      "id": 1,
-      "name": "Christmas Sale",
-      "type": "Discount",
-      "targets": ["B3-92-BD-33-BA-DA", "G9-98-HG-39-IJ-JK"],
-      "percentage": 25,
-      "startDate": "2023-12-20",
-      "endDate": "2023-12-25"
+    "id": 1,
+    "name": "Christmas Sale",
+    "type": "Discount",
+    "targets": ["B3-92-BD-33-BA-DA", "G9-98-HG-39-IJ-JK"],
+    "percentage": 25,
+    "startDate": "2023-12-20",
+    "endDate": "2023-12-25"
   },
   {
-      "id": 2,
-      "name": "New Year Free Shipping",
-      "type": "FreeShipping",
-      "targets": ["B4-93-BE-34-CA-DB", "F8-97-GF-38-HD-HI"],
-      "startDate": "2023-12-30",
-      "endDate": "2024-01-02"
-  },
-  {
-      "id": 3,
-      "name": "Spring Sale",
-      "type": "Discount",
-      "targets": ["B4-93-BE-34-CA-DB", "F8-97-GF-38-HD-HI"],
-      "percentage": 15,
-      "startDate": "2024-03-20",
-      "endDate": "2024-03-25"
-  }
-,
-  {
-    "id": 4,
-    "name": "Spring Salea",
+    "id": 2,
+    "name": "New Year Free Shipping",
     "type": "FreeShipping",
-    "targets": ["B4-93-BE-34-CA-DB", "D6-95-DF-36-EB-FD"],
+    "targets": ["B4-93-BE-34-CA-DB", "F8-97-GF-38-HD-HI"],
+    "startDate": "2023-12-30",
+    "endDate": "2024-01-02"
+  },
+  {
+    "id": 3,
+    "name": "Spring Sale",
+    "type": "Discount",
+    "targets": ["B4-93-BE-34-CA-DB", "F8-97-GF-38-HD-HI"],
     "percentage": 15,
     "startDate": "2024-03-20",
     "endDate": "2024-03-25"
-}
+  },
+  {
+    "id": 4,
+    "name": "Spring Free Shipping",
+    "type": "FreeShipping",
+    "targets": ["B4-93-BE-34-CA-DB", "D6-95-DF-36-EB-FD"],
+    "startDate": "2024-03-20",
+    "endDate": "2024-03-25"
+  }
 ]

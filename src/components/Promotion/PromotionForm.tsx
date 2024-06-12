@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Promotion, PromotionType, Product } from './types';
-
+import { Promotion, PromotionType } from '../../types/promotionTypes';
+import { Product } from '@/types/productType';
 interface PromotionFormProps {
   products: Product[];
   initialPromotion: Promotion;

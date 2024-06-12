@@ -3,58 +3,7 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
-
-interface Item {
-  id: number;
-  name: string;
-  description: string;
-  shippedFrom: string;
-  color: string;
-  size: string;
-  price: number;
-  shippingCost: number;
-  quantity: number;
-  imageUrl: string;
-}
-
-const items: Item[] = [
-  {
-    id: 1,
-    name: 'MARNI',
-    description: 'Blue Trunk Bag in Buffalo',
-    shippedFrom: 'Marni',
-    color: 'Blue',
-    size: 'One Size',
-    price: 2150.0,
-    shippingCost: 15.0,
-    quantity: 1,
-    imageUrl: '/path/to/marni-bag.jpg',
-  },
-  {
-    id: 2,
-    name: 'COMMON PROJECTS',
-    description: 'White Achilles Retro Low Sneaker',
-    shippedFrom: 'Ssense',
-    color: 'White',
-    size: 'IT 36',
-    price: 485.0,
-    shippingCost: 0.0,
-    quantity: 1,
-    imageUrl: '/path/to/common-projects.jpg',
-  },
-  {
-    id: 3,
-    name: 'MAJE',
-    description: 'ECLARE Ethnic Poncho',
-    shippedFrom: 'Maje',
-    color: 'Grey',
-    size: 'One Size',
-    price: 220.0,
-    shippingCost: 0.0,
-    quantity: 1,
-    imageUrl: '/path/to/maje-poncho.jpg',
-  },
-];
+import items  from '@/data/OrderProduct.json';
 
 const groupBy = <T,>(array: T[], key: keyof T): Record<string, T[]> => {
   return array.reduce(
@@ -71,12 +20,12 @@ const groupBy = <T,>(array: T[], key: keyof T): Record<string, T[]> => {
 };
 
 const ShoppingBag = () => {
-  const groupedItems = groupBy(items, 'shippedFrom');
+  const groupedItems = groupBy(items, 'company');
   const [itemQuantities, setItemQuantities] = useState(
     items.map(item => ({ id: item.id, quantity: item.quantity })),
   );
 
-  const handleQuantityChange = (id: number, quantity: number) => {
+  const handleQuantityChange = (id: string, quantity: number) => {
     setItemQuantities(
       itemQuantities.map(item =>
         item.id === id ? { ...item, quantity } : item,
@@ -84,16 +33,19 @@ const ShoppingBag = () => {
     );
   };
 
-  const getItemQuantity = (id: number) => {
+  const getItemQuantity = (id: string) => {
     const item = itemQuantities.find(item => item.id === id);
     return item ? item.quantity : 1;
   };
 
   const subtotal = items.reduce(
-    (sum, item) => sum + item.price * getItemQuantity(item.id),
+    (sum, item) => sum + item.unitPrice * getItemQuantity(item.id),
     0,
   );
-  const totalShipping = items.reduce((sum, item) => sum + item.shippingCost, 0);
+  const totalShipping = items.reduce(
+    (sum, item) => sum + (item.freeShipping ? 0 : 15),
+    0,
+  ); // Assuming a flat shipping rate for simplicity
   const total = subtotal + totalShipping;
 
   return (
@@ -111,27 +63,27 @@ const ShoppingBag = () => {
                 >
                   <div className="flex items-center space-x-4">
                     <Image
-                      src={item.imageUrl}
+                      src={item.image}
                       alt={item.description}
                       width={50}
                       height={50}
                     />
                     <div>
-                      <h3 className="font-semibold">{item.name}</h3>
+                      <h3 className="font-semibold">{item.productName}</h3>
                       <p className="text-sm text-gray-500">
                         {item.description}
                       </p>
                       <p className="text-sm text-gray-500">
-                        Color: {item.color}, Size: {item.size}
+                        Quantity: {item.quantity}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">
-                    <span>${item.price.toFixed(2)}</span>
+                    <span>${item.unitPrice.toFixed(2)}</span>
                     <span>
-                      {item.shippingCost > 0
-                        ? `Est. shipping $${item.shippingCost.toFixed(2)}`
-                        : 'Free shipping'}
+                      {item.freeShipping
+                        ? 'Free shipping'
+                        : `Est. shipping $15.00`}
                     </span>
                     <input
                       type="number"

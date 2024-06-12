@@ -25,7 +25,7 @@ const SliderCp: React.FC<SliderCpProps> = ({ api: api1 }) => {
       <div className="" key={product.id}>
         <div className="grid justify-items-center ">
           <img
-            src=".\product\product.jpg"
+            src={product.image}
             className="max-h-64 justify-center mt-6"
           />
           <h1 className="my-4">{product.productName}</h1>

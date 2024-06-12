@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Promotion, PromotionType, Product } from './types';
-
+import { Promotion, PromotionType } from '../../types/promotionTypes';
+import { Product } from '@/types/productType';
 interface PromotionListProps {
   promotions: Promotion[];
   products: Product[];

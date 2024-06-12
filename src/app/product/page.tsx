@@ -1,3 +1,4 @@
+// pages/index.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -5,29 +6,15 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import FilterSidebar from '@/components/productslice/FilterSidebar';
 import ProductGrid from '@/components/productslice/ProductGrid';
 import products from '@/data/products.json';
-import promotions from '@/data/promotions.json';
+import promotionsJson from '@/data/promotions.json';
+import { Promotion, PromotionType } from '@/types/promotionTypes';
 
-interface Product {
-  id: string;
-  productName: string;
-  description: string;
-  quantity: number;
-  unitPrice: number;
-  image: string;
-  freeShipping: boolean;
-  company: string;
-  category: string;
-}
 
-interface Promotion {
-  id: number;
-  name: string;
-  type: string;
-  targets: string[];
-  percentage?: number;
-  startDate: string;
-  endDate: string;
-}
+
+const promotions: Promotion[] = promotionsJson.map(promo => ({
+  ...promo,
+  type: promo.type as PromotionType
+}));
 
 const Home: React.FC = () => {
   const pathname = usePathname();

@@ -2,29 +2,8 @@ import React from 'react';
 import { toSlug } from '@/utils/slug';
 import Link from 'next/link';
 import Image from 'next/image';
-
-interface Product {
-  id: string;
-  productName: string;
-  description: string;
-  quantity: number;
-  unitPrice: number;
-  image: string;
-  freeShipping: boolean;
-  company: string;
-  category: string;
-}
-
-interface Promotion {
-  id: number;
-  name: string;
-  type: string;
-  targets: string[];
-  percentage?: number;
-  startDate: string;
-  endDate: string;
-}
-
+import { Promotion} from '../../types/promotionTypes';
+import { Product } from '@/types/productType';
 interface ProductGridProps {
   filters: string[] | null;
   priceRange: [number, number];
@@ -102,7 +81,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({
                 ) : (
                   <p className="mt-1 text-gray-700">${product.unitPrice.toFixed(2)}</p>
                 )}
-                <p className="mt-1 text-gray-500">Quantity: {product.quantity}</p>
+                <p className="mt-1 text-gray-500">Quantity: {product.stock}</p>
                 <p className="mt-1 text-gray-500">Company: {product.company}</p>
                 <p className="mt-1 text-gray-500">Category: {product.category}</p>
               </div>

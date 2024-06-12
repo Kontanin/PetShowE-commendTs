@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from 'react';
-import products from './mockData.json';
+import products from '@/data/products.json';
 import Image from 'next/image';
 import AddToCartButton from '../../../components/ProductCart/AddToCartButton';
 import PriceTag from '@/components/productslice/PriceTag';

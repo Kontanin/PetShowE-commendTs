@@ -1,4 +1,6 @@
 import React from 'react';
+import Link from 'next/link';
+
 const pugImage = '/home/1.jpg';
 
 const PetShopHero = () => {
@@ -15,12 +17,17 @@ const PetShopHero = () => {
             eiusmod tempor incididunt ut labore et dolore magna aliqua.
           </p>
           <div className="flex space-x-4">
+            <Link href="/product">
             <button className="bg-black text-white px-6 py-3 rounded-full text-lg">
               Shop
             </button>
-            <button className="bg-white text-black border border-black px-6 py-3 rounded-full text-lg">
+            </Link>
+<Link href="/about">
+<button className="bg-white text-black border border-black px-6 py-3 rounded-full text-lg">
               About Us
             </button>
+</Link>
+
           </div>
         </div>
         <div className="w-1/2 h-full">

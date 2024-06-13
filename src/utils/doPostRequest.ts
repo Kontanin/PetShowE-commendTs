@@ -1,9 +1,13 @@
 import axios from 'axios';
 
-async function doPostRequest(payload: string, path: string) {
+async function doPostRequest(payload: object, path: string) {
   console.log(payload, 'payload');
   try {
-    const res = await axios.post(path, payload);
+    const res = await axios.post(path, payload, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
     const body = res.data;
 
     return body;

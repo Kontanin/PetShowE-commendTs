@@ -1,139 +1,76 @@
-'use client';
+// src/components/Promotion/PromotionForm.tsx
 
-import React, { useState, useEffect } from 'react';
-import { Promotion, PromotionType } from '../../types/promotionTypes';
-import { Product } from '@/types/productType';
+import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import { Promotion, PromotionType } from '@/types/promotionTypes';
+import InputWithLabel from '@/components/Form/InputWithLabel';
+import FormSubmitButton from '@/components/Form/FormSubmitButton';
+
 interface PromotionFormProps {
-  products: Product[];
+  products: { id: string; productName: string; company: string; category: string }[];
   initialPromotion: Promotion;
   isEditing: boolean;
   onSubmit: (promotion: Promotion) => void;
 }
 
 const PromotionForm: React.FC<PromotionFormProps> = ({ products, initialPromotion, isEditing, onSubmit }) => {
-  const [formState, setFormState] = useState<Promotion>(initialPromotion);
-  const [targetType, setTargetType] = useState<string>('productId'); // 'productId', 'company', 'category'
+  const [promotion, setPromotion] = useState<Promotion>(initialPromotion);
+  const [targetType, setTargetType] = useState<string>('productId');
 
   useEffect(() => {
-    setFormState(initialPromotion);
+    setPromotion(initialPromotion);
   }, [initialPromotion]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    if (name === 'targets' && e.target instanceof HTMLSelectElement) {
-      const selectedTargets = Array.from(e.target.selectedOptions, option => option.value);
-      setFormState({
-        ...formState,
-        [name]: selectedTargets,
-      });
-    } else {
-      setFormState({
-        ...formState,
-        [name]: name === 'percentage' ? parseInt(value, 10) : value,
-      });
-    }
+    setPromotion({ ...promotion, [name]: value });
   };
 
-  const handleTargetTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleTargetChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const { value } = e.target;
+    setPromotion({ ...promotion, targets: [value] });
+  };
+
+  const handleTargetTypeChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setTargetType(e.target.value);
-    setFormState({
-      ...formState,
-      targets: [],
-    });
+    setPromotion({ ...promotion, targets: [] });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    let updatedTargets: string[] = [];
-
-    if (targetType === 'company') {
-      const companyProducts = products.filter(product => formState.targets.includes(product.company));
-      updatedTargets = companyProducts.map(product => product.id);
-    } else if (targetType === 'category') {
-      const categoryProducts = products.filter(product => formState.targets.includes(product.category));
-      updatedTargets = categoryProducts.map(product => product.id);
-    } else {
-      updatedTargets = formState.targets;
-    }
-
-    onSubmit({ ...formState, targets: updatedTargets });
+    onSubmit(promotion);
   };
+
+  const uniqueCompanies = Array.from(new Set(products.map(product => product.company)));
+  const uniqueCategories = Array.from(new Set(products.map(product => product.category)));
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleFormSubmit} className="mb-6">
+      <InputWithLabel
+        label="Promotion Name"
+        placeholder="Promotion Name"
+        form={{ name: 'name', value: promotion.name, onChange: handleChange }}
+        error={{ message: '' }} // Pass empty error object if no error
+      />
       <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-          Promotion Name
-        </label>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          value={formState.name}
-          onChange={handleChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-        />
-      </div>
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="type">
-          Promotion Type
-        </label>
+        <label className="block text-gray-700 text-sm font-bold mb-2">Promotion Type</label>
         <select
-          id="type"
           name="type"
-          value={formState.type}
+          value={promotion.type}
           onChange={handleChange}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg"
         >
           <option value={PromotionType.Discount}>Discount</option>
-          <option value={PromotionType.FreeShipping}>Free Shipping</option>
+          <option value={PromotionType.FreeShipping}>FreeShipping</option>
         </select>
       </div>
-      {formState.type === PromotionType.Discount && (
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="percentage">
-            Discount Percentage
-          </label>
-          <input
-            type="number"
-            id="percentage"
-            name="percentage"
-            value={formState.percentage || ''}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-          />
-        </div>
-      )}
+      <InputWithLabel
+        label="Description"
+        placeholder="Description"
+        form={{ name: 'description', value: promotion.description, onChange: handleChange }}
+        error={{ message: '' }} // Pass empty error object if no error
+      />
       <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="startDate">
-          Start Date
-        </label>
-        <input
-          type="date"
-          id="startDate"
-          name="startDate"
-          value={formState.startDate}
-          onChange={handleChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-        />
-      </div>
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="endDate">
-          End Date
-        </label>
-        <input
-          type="date"
-          id="endDate"
-          name="endDate"
-          value={formState.endDate}
-          onChange={handleChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-        />
-      </div>
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="targetType">
-          Target Type
-        </label>
+        <label className="block text-gray-700 text-sm font-bold mb-2">Target Type</label>
         <select
           id="targetType"
           value={targetType}
@@ -146,66 +83,61 @@ const PromotionForm: React.FC<PromotionFormProps> = ({ products, initialPromotio
         </select>
       </div>
       <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="targets">
-          Targets
-        </label>
-        {targetType === 'productId' && (
-          <select
-            id="targets"
-            name="targets"
-            multiple
-            value={formState.targets}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-          >
-            {products.map((product) => (
+        <label className="block text-gray-700 text-sm font-bold mb-2">Target</label>
+        <select
+          name="targets"
+          value={promotion.targets[0] || ''}
+          onChange={handleTargetChange}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+        >
+          {targetType === 'productId' &&
+            products.map(product => (
               <option key={product.id} value={product.id}>
                 {product.productName}
               </option>
             ))}
-          </select>
-        )}
-        {targetType === 'company' && (
-          <select
-            id="targets"
-            name="targets"
-            multiple
-            value={formState.targets}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-          >
-            {Array.from(new Set(products.map(product => product.company))).map(company => (
+          {targetType === 'company' &&
+            uniqueCompanies.map(company => (
               <option key={company} value={company}>
                 {company}
               </option>
             ))}
-          </select>
-        )}
-        {targetType === 'category' && (
-          <select
-            id="targets"
-            name="targets"
-            multiple
-            value={formState.targets}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-          >
-            {Array.from(new Set(products.map(product => product.category))).map(category => (
+          {targetType === 'category' &&
+            uniqueCategories.map(category => (
               <option key={category} value={category}>
                 {category}
               </option>
             ))}
-          </select>
-        )}
+        </select>
       </div>
-      <div className="flex justify-center">
-        <button
-          type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-        >
-          {isEditing ? 'Update Promotion' : 'Add Promotion'}
-        </button>
+      {promotion.type === PromotionType.Discount && (
+        <InputWithLabel
+          label="Discount Percentage"
+          placeholder="Discount Percentage"
+          form={{ name: 'percentage', value: promotion.percentage || '', onChange: handleChange }}
+          type="number"
+          error={{ message: '' }} // Pass empty error object if no error
+        />
+      )}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <InputWithLabel
+          label="Start Date"
+          placeholder="Start Date"
+          form={{ name: 'startDate', value: promotion.startDate, onChange: handleChange }}
+          type="date"
+          error={{ message: '' }} // Pass empty error object if no error
+        />
+        <InputWithLabel
+          label="End Date"
+          placeholder="End Date"
+          form={{ name: 'endDate', value: promotion.endDate, onChange: handleChange }}
+          type="date"
+          error={{ message: '' }} // Pass empty error object if no error
+        />
       </div>
+      <FormSubmitButton className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+        {isEditing ? 'Update Promotion' : 'Create Promotion'}
+      </FormSubmitButton>
     </form>
   );
 };

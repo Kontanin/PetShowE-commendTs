@@ -25,18 +25,25 @@ export const AddressForm = ({ errors }: AddressFormProps) => {
         form={register('subdistrict')}
         error={errors.subdistrict}
       />
-      <InputWithLabel
-        label="Country"
-        placeholder="Country"
-        form={register('country')}
-        error={errors.country}
-      />
-      <InputWithLabel
-        label="Zipcode"
-        placeholder="Zipcode"
-        form={register('zipcode')}
-        error={errors.zipcode}
-      />
+      <div className="flex space-x-4">
+        <div className="w-1/2">
+          <InputWithLabel
+            label="Country"
+            placeholder="Country"
+            form={register('country')}
+            error={errors.country}
+          />
+        </div>
+        <div className="w-1/2">
+          <InputWithLabel
+            label="Zipcode"
+            placeholder="Zipcode"
+            form={register('zipcode', { setValueAs: v => v === "" ? undefined : parseInt(v) })}
+            error={errors.zipcode}
+          />
+        </div>
+      </div>
     </>
   );
 };
+

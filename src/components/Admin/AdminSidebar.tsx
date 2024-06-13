@@ -31,7 +31,7 @@ const AdminSidebar: React.FC = () => {
           </Link>
         </li>
         <li className="mb-4">
-          <Link href="/admin/marketing">
+          <Link href="/admin/promotions">
             <div className="py-2 px-4 hover:bg-yellow-600 rounded transition duration-200">
               <h2 className="text-lg font-semibold">Marketing</h2>
               <p className="text-sm">Manage all marketing campaigns and analytics.</p>

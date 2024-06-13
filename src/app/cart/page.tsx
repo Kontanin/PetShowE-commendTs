@@ -3,7 +3,12 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
-import items  from '@/data/OrderProduct.json';
+import items from '@/data/OrderProduct.json';
+import { useRouter } from 'next/navigation';
+import doPostRequest from '@/utils/doPostRequest';
+import { OrderProduct, OrderPayload } from '@/types/orderProductType';
+
+import Link from 'next/link';
 
 const groupBy = <T,>(array: T[], key: keyof T): Record<string, T[]> => {
   return array.reduce(
@@ -20,6 +25,7 @@ const groupBy = <T,>(array: T[], key: keyof T): Record<string, T[]> => {
 };
 
 const ShoppingBag = () => {
+  const router = useRouter();
   const groupedItems = groupBy(items, 'company');
   const [itemQuantities, setItemQuantities] = useState(
     items.map(item => ({ id: item.id, quantity: item.quantity })),
@@ -48,6 +54,24 @@ const ShoppingBag = () => {
   ); // Assuming a flat shipping rate for simplicity
   const total = subtotal + totalShipping;
 
+  const handleSecureCheckout = async () => {
+    const payload: OrderPayload = {
+      userId: 'some-user-id', // replace with actual user ID
+      items: itemQuantities.map(i => ({ id: i.id, quantity: i.quantity })),
+      totalAmount: total,
+      shippingFee:20
+      ,tax:20
+    };
+
+    const response = await doPostRequest(payload, '/api/create-order');
+
+    if (response) {
+      router.push('/cart/test'); // redirect to the payment page
+    } else {
+      console.error('Payment failed');
+    }
+  };
+
   return (
     <div className="min-h-full bg-gray-100 flex items-start justify-center py-10">
       <div className="bg-white shadow-md rounded-lg w-3/4 p-8">
@@ -56,7 +80,7 @@ const ShoppingBag = () => {
           <div key={key}>
             <h3 className="text-xl font-semibold mb-4">{key}</h3>
             <div className="space-y-4">
-              {groupedItems[key].map(item => (
+              {groupedItems[key].map((item: OrderProduct) => (
                 <div
                   key={item.id}
                   className="flex items-center justify-between p-4 border rounded-lg"
@@ -115,10 +139,15 @@ const ShoppingBag = () => {
           </div>
         </div>
         <div className="mt-6 flex justify-end space-x-4">
-          <button className="px-6 py-2 border rounded-lg">
-            Continue Shopping
-          </button>
-          <button className="px-6 py-2 bg-blue-600 text-white rounded-lg">
+          <Link href="/products">
+            <button className="px-6 py-2 border rounded-lg">
+              Continue Shopping
+            </button>
+          </Link>
+          <button
+            onClick={handleSecureCheckout}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg"
+          >
             Secure Checkout
           </button>
         </div>

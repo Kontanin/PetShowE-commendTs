@@ -9,7 +9,11 @@ export const step2Schema = z.object({
   address: z.string().optional(),
   subdistrict: z.string().optional(),
   country: z.string().optional(),
-  zipcode: z.number().optional(),
+  zipcode: z
+    .union([z.string(), z.number()])
+    .optional()
+    .transform((val) => (typeof val === 'string' ? parseInt(val, 10) : val))
+    .refine((val) => !isNaN(val as number) || val === undefined, { message: 'Zipcode must be a valid number' }),
 });
 
 export const step3Schema = z.object({

@@ -50,7 +50,6 @@ const MarketingManagement: React.FC = () => {
 
   const handleSubmit = (promotion: Promotion) => {
     let updatedTargets: string[] = [];
-
     if (promotion.targets.some(target => productsData.some(product => product.company === target))) {
       const companyProducts = productsData.filter(product => promotion.targets.includes(product.company));
       updatedTargets = companyProducts.map(product => product.id);

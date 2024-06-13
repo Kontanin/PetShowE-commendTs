@@ -40,6 +40,9 @@ const orders: Order[] = [
     items: [
       { id: 'item_1', productName: 'Product 1', quantity: 2, unitPrice: 50 },
       { id: 'item_2', productName: 'Product 2', quantity: 1, unitPrice: 100 },
+      { id: 'item_2', productName: 'Product 2', quantity: 1, unitPrice: 100 },
+      { id: 'item_2', productName: 'Product 2', quantity: 1, unitPrice: 100 },
+      { id: 'item_2', productName: 'Product 2', quantity: 1, unitPrice: 100 },
     ],
   },
   {
@@ -132,12 +135,7 @@ const OrderManagement: React.FC<OrderManagementProps> = () => {
                 {new Date(order.createdAt).toLocaleDateString()}
               </td>
               <td className="py-2 px-4 border-b border-gray-200">
-                <button
-                  className="bg-blue-500 text-white px-4 py-2 rounded mr-2 hover:bg-blue-600"
-                  onClick={() => handleView(order)}
-                >
-                  View
-                </button>
+
                 <button
                   className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
                   onClick={() => handleView(order)}

@@ -6,7 +6,7 @@ import { useState } from 'react';
 import items from '@/data/OrderProduct.json';
 import { useRouter } from 'next/navigation';
 import doPostRequest from '@/utils/doPostRequest';
-import { OrderProduct, OrderPayload } from '@/types/orderProductType';
+import { OrderProduct, OrderPayload } from '@/types/OrderProductType';
 
 import Link from 'next/link';
 

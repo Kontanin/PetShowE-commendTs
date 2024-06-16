@@ -20,7 +20,7 @@ export default function FristPart() {
             radius="lg"
             color="default"
           >
-            <p className="text-base text-fuchsia-950">Product</p>
+            <p className="text-base text-black">Product</p>
           </Button>
         </DropdownTrigger>
       </NavbarItem>

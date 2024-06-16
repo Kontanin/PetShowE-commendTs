@@ -18,7 +18,7 @@ import { CartStore } from '@/store/CartStore';
 
 export default function Lastpart() {
   const Order = CartStore(state => state.cart);
-  const { isAuthenticated, setIsAuthenticated, role } = UserStore();
+  const { isAuthenticated, setIsAuthenticated, role, firstName } = UserStore();
   const [permissions, setPermissions] = useState(false);
   useEffect(() => {
     if (isAuthenticated && role == 'admin') {
@@ -57,7 +57,9 @@ export default function Lastpart() {
           <PopoverTrigger>
             <Button className="flex items-center space-x-2 bg-transparent hover:bg-gray-200 rounded-full p-2">
               <FaUserCircle size={30} className="text-gray-700" />
-              <span className="hidden lg:inline text-gray-700">Profile</span>
+              <span className="hidden lg:inline text-gray-700">
+                {firstName}
+              </span>
             </Button>
           </PopoverTrigger>
           <PopoverContent className="p-4">

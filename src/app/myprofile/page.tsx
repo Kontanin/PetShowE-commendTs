@@ -1,8 +1,8 @@
-'use client'
+'use client';
 import React, { useState } from 'react';
 import { AddressEdit } from '@/components/MyProfile/AdressEdit';
 import { ProfileEdit } from '@/components/MyProfile/ProfileEdit';
-import { OrderEdit } from '@/components/MyProfile/OrderEdit';
+import OrderEdit from '@/components/MyProfile/OrderEdit';
 
 enum Tab {
   Profile = 'Profile',
@@ -11,7 +11,7 @@ enum Tab {
 }
 
 const SidebarNavigation: React.FC = () => {
-  const bottoncss = "w-full text-lg font-bold py-4 px-2 text-center";
+  const bottoncss = 'w-full text-lg font-bold py-4 px-2 text-center';
   const [selectedTab, setSelectedTab] = useState<Tab>(Tab.Profile);
 
   const renderContent = () => {
@@ -49,9 +49,7 @@ const SidebarNavigation: React.FC = () => {
           My Order
         </button>
       </div>
-      <div className="w-3/4 p-6">
-        {renderContent()}
-      </div>
+      <div className="w-3/4 p-6">{renderContent()}</div>
     </div>
   );
 };

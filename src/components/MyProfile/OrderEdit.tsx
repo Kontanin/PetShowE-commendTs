@@ -1,4 +1,5 @@
 import React from 'react';
+import { useRouter } from 'next/navigation';
 
 interface Order {
   id: string;
@@ -32,7 +33,7 @@ const initialOrders: Order[] = [
     isActive: true,
     shippingFee: false,
     total: 75.5,
-    status: 'Processing',
+    status: 'Pending',
     timestamps: '2024-06-05T12:00:00Z',
     tax: 5.5,
     userId: 'user2',
@@ -54,6 +55,12 @@ const initialOrders: Order[] = [
 ];
 
 export const OrderEdit: React.FC = () => {
+  const router = useRouter();
+
+  const handlePaymentClick = (orderId: string) => {
+    router.push(`/payment/${orderId}`);
+  };
+
   return (
     <div className="mx-auto bg-white p-8 rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold mb-6 text-center">My Orders</h2>
@@ -65,21 +72,54 @@ export const OrderEdit: React.FC = () => {
               <th className="py-2 px-4 border-b-2 border-gray-200">Status</th>
               <th className="py-2 px-4 border-b-2 border-gray-200">Total</th>
               <th className="py-2 px-4 border-b-2 border-gray-200">Tax</th>
-              <th className="py-2 px-4 border-b-2 border-gray-200">Date Created</th>
-              <th className="py-2 px-4 border-b-2 border-gray-200">Date Updated</th>
+              <th className="py-2 px-4 border-b-2 border-gray-200">
+                Date Created
+              </th>
+              <th className="py-2 px-4 border-b-2 border-gray-200">
+                Date Updated
+              </th>
+              <th className="py-2 px-4 border-b-2 border-gray-200">Action</th>
             </tr>
           </thead>
           <tbody>
-            {initialOrders.map((order) => (
+            {initialOrders.map(order => (
               <tr key={order.id}>
-                <td className="py-2 px-4 border-b border-gray-200">{order.id}</td>
-                <td className={`py-2 px-4 border-b border-gray-200 ${order.status === 'Shipped' ? 'text-blue-500' : order.status === 'Processing' ? 'text-yellow-500' : 'text-green-500'}`}>
+                <td className="py-2 px-4 border-b border-gray-200">
+                  {order.id}
+                </td>
+                <td
+                  className={`py-2 px-4 border-b border-gray-200 ${
+                    order.status === 'Shipped'
+                      ? 'text-blue-500'
+                      : order.status === 'Pending'
+                        ? 'text-yellow-500'
+                        : 'text-green-500'
+                  }`}
+                >
                   {order.status}
                 </td>
-                <td className="py-2 px-4 border-b border-gray-200">${order.total.toFixed(2)}</td>
-                <td className="py-2 px-4 border-b border-gray-200">${order.tax.toFixed(2)}</td>
-                <td className="py-2 px-4 border-b border-gray-200">{new Date(order.createdAt).toLocaleDateString()}</td>
-                <td className="py-2 px-4 border-b border-gray-200">{new Date(order.updatedAt).toLocaleDateString()}</td>
+                <td className="py-2 px-4 border-b border-gray-200">
+                  ${order.total.toFixed(2)}
+                </td>
+                <td className="py-2 px-4 border-b border-gray-200">
+                  ${order.tax.toFixed(2)}
+                </td>
+                <td className="py-2 px-4 border-b border-gray-200">
+                  {new Date(order.createdAt).toLocaleDateString()}
+                </td>
+                <td className="py-2 px-4 border-b border-gray-200">
+                  {new Date(order.updatedAt).toLocaleDateString()}
+                </td>
+                <td className="py-2 px-4 border-b border-gray-200">
+                  {order.status === 'Pending' && (
+                    <button
+                      onClick={() => handlePaymentClick(order.id)}
+                      className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                    >
+                      Go to Payment
+                    </button>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -88,3 +128,5 @@ export const OrderEdit: React.FC = () => {
     </div>
   );
 };
+
+export default OrderEdit;

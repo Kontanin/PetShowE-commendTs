@@ -2,14 +2,14 @@
 
 import React, { useState } from 'react';
 import QRCode from 'react-qr-code';
-
+import Image from 'next/image';
 const PaymentPage = () => {
   const [paymentMethod, setPaymentMethod] = useState('visa');
   const [visaDetails, setVisaDetails] = useState({
     cardNumber: '',
     expiryDate: '',
     cvv: '',
-    cardHolderName: ''
+    cardHolderName: '',
   });
   const [message, setMessage] = useState('');
 
@@ -77,10 +77,20 @@ const PaymentPage = () => {
         </div>
         {paymentMethod === 'visa' && (
           <div className="mb-6">
-            <h3 className="text-xl font-semibold">Visa Payment</h3>
+            <h3 className="text-xl font-semibold pt-5">Visa Payment</h3>
+            <Image
+              src="/visa.jpg"
+              width={100}
+              height={200}
+              alt="visa"
+              className="py-5"
+            ></Image>
             <form>
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="cardNumber">
+                <label
+                  className="block text-gray-700 text-sm font-bold mb-2"
+                  htmlFor="cardNumber"
+                >
                   Card Number
                 </label>
                 <input
@@ -93,7 +103,10 @@ const PaymentPage = () => {
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="expiryDate">
+                <label
+                  className="block text-gray-700 text-sm font-bold mb-2"
+                  htmlFor="expiryDate"
+                >
                   Expiry Date
                 </label>
                 <input
@@ -106,7 +119,10 @@ const PaymentPage = () => {
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="cvv">
+                <label
+                  className="block text-gray-700 text-sm font-bold mb-2"
+                  htmlFor="cvv"
+                >
                   CVV
                 </label>
                 <input
@@ -119,7 +135,10 @@ const PaymentPage = () => {
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="cardHolderName">
+                <label
+                  className="block text-gray-700 text-sm font-bold mb-2"
+                  htmlFor="cardHolderName"
+                >
                   Card Holder Name
                 </label>
                 <input
@@ -137,6 +156,13 @@ const PaymentPage = () => {
         {paymentMethod === 'qr' && (
           <div className="mb-6">
             <h3 className="text-xl font-semibold">QR Code Payment</h3>
+            <Image
+              src="/PromptPay.png"
+              width={150}
+              height={300}
+              alt="visa"
+              className="py-5"
+            ></Image>
             <QRCode value="https://example.com" />
           </div>
         )}

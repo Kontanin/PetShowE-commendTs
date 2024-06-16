@@ -5,20 +5,19 @@ export type UserTypes = {
   email: string;
   password: string;
   id: string;
-  username: string;
+  firstName: string;
   role: string;
 };
 
 export type UserStore = {
   id: string;
   role: string;
+  firstName: string;
   isAuthenticated: boolean;
   setUser: (user: UserTypes) => void;
   setIsAuthenticated: (auth: boolean) => void;
   checkToken: () => Promise<void>;
 };
-
-
 
 export interface Profile {
   email: string;
@@ -26,16 +25,15 @@ export interface Profile {
   roles: string[];
 }
 
-
-
 export const UserStore = create(
   persist<UserStore>(
     (set, get) => ({
       id: '',
       role: '',
+      firstName: '',
       isAuthenticated: false,
       setUser: (user: UserTypes) => {
-        set({ id: user.id, role: user.role });
+        set({ id: user.id, role: user.role, firstName: user.firstName });
       },
       setIsAuthenticated: (auth: boolean) => {
         set({ isAuthenticated: auth });

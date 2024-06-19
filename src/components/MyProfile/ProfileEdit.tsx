@@ -1,4 +1,7 @@
+// src/pages/ProfileEdit.tsx
+
 import React, { useState, useEffect } from 'react';
+import doUpdateRequest from '@/utils/doUpdateRequest';
 
 export const ProfileEdit = () => {
   const initialProfile = {
@@ -49,10 +52,15 @@ export const ProfileEdit = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Here you can handle the form submission, e.g., send data to the server.
-    console.log('Profile updated:', profile);
+    // Send data to the server
+    const result = await doUpdateRequest(profile, '/api/profile');
+    if (result) {
+      console.log('Profile updated successfully', result);
+    } else {
+      console.error('Failed to update profile');
+    }
   };
 
   return (
@@ -123,7 +131,7 @@ export const ProfileEdit = () => {
       <div className="w-1/3 text-center flex flex-col items-center justify-center">
         <img
           className="w-96 h-96 overflow-hidden mb-4 rounded-full shadow-lg"
-          src={imagePreview ? (imagePreview as string) : "/mnt/data/image.png"}
+          src={imagePreview ? (imagePreview as string) : '/mnt/data/image.png'}
           alt="Profile Picture"
         />
         <input

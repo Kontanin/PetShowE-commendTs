@@ -6,6 +6,9 @@ import React, { useState, useEffect } from 'react';
 import PromotionForm from '@/components/Promotion/PromotionForm';
 import PromotionList from '@/components/Promotion/PromotionList';
 import { Promotion, PromotionType } from '@/types/promotionTypes';
+import doPostRequest from '@/utils/doPostRequest';
+import doDeleteRequest from '@/utils/doDeleteRequest';
+import doUpdateRequest from '@/utils/doUpdateRequest'; // Import the update request utility
 
 // Import JSON files
 import productsData from '@/data/products.json';
@@ -44,11 +47,16 @@ const MarketingManagement: React.FC = () => {
     setIsEditing(true);
   };
 
-  const handleDelete = (id: string) => {
-    setPromotions(promotions.filter(p => p.id !== id));
+  const handleDelete = async (id: string) => {
+    const result = await doDeleteRequest(`/api/promotions/${id}`);
+    if (result) {
+      setPromotions(promotions.filter(p => p.id !== id));
+    } else {
+      console.error('Failed to delete promotion');
+    }
   };
 
-  const handleSubmit = (promotion: Promotion) => {
+  const handleSubmit = async (promotion: Promotion) => {
     let updatedTargets: string[] = [];
     if (promotion.targets.some(target => productsData.some(product => product.company === target))) {
       const companyProducts = productsData.filter(product => promotion.targets.includes(product.company));
@@ -63,11 +71,22 @@ const MarketingManagement: React.FC = () => {
     const updatedPromotion = { ...promotion, targets: updatedTargets };
 
     if (isEditing) {
-      setPromotions(promotions.map(p => p.id === promotion.id ? updatedPromotion : p));
-      setIsEditing(false);
+      const result = await doUpdateRequest(updatedPromotion, `/api/promotions/${promotion.id}`);
+      if (result) {
+        setPromotions(promotions.map(p => p.id === promotion.id ? result : p));
+        setIsEditing(false);
+      } else {
+        console.error('Failed to update promotion');
+      }
     } else {
-      setPromotions([...promotions, { ...updatedPromotion, id: (promotions.length + 1).toString() }]);
+      const result = await doPostRequest(updatedPromotion, '/api/promotions');
+      if (result) {
+        setPromotions([...promotions, { ...result, id: (promotions.length + 1).toString() }]);
+      } else {
+        console.error('Failed to create promotion');
+      }
     }
+
     setCurrentPromotion({
       id: '',
       name: '',

@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { BlogPost } from '@/types/blogType';
 import axios from 'axios';
-
+import  doPostRequest  from '@/utils/doPostRequest'
+import  doUpdateRequest  from '@/utils/doUpdateRequest'
 const BlogManagement: React.FC = () => {
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [selectedBlog, setSelectedBlog] = useState<BlogPost | null>(null);
@@ -67,35 +68,21 @@ const BlogManagement: React.FC = () => {
 
     if (selectedBlog) {
       // Update existing blog
-      fetch(`/api/blogs/${selectedBlog.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(blogData),
-      })
-        .then(response => response.json())
-        .then(updatedBlog => {
-          setBlogs(
-            blogs.map(blog =>
-              blog.id === updatedBlog.id ? updatedBlog : blog,
-            ),
-          );
-          setSelectedBlog(null);
-          setNewBlog({ title: '', content: '', tag: '', image: '' });
-          setFile(null);
-        });
+      const updatedBlog = await doUpdateRequest(blogData, `/api/blogs/${selectedBlog.id}`);
+      if (updatedBlog) {
+        setBlogs(blogs.map(blog => blog.id === updatedBlog.id ? updatedBlog : blog));
+        setSelectedBlog(null);
+        setNewBlog({ title: '', content: '', tag: '', image: '' });
+        setFile(null);
+      }
     } else {
       // Create new blog
-      fetch('/api/blogs', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(blogData),
-      })
-        .then(response => response.json())
-        .then(createdBlog => {
-          setBlogs([...blogs, createdBlog]);
-          setNewBlog({ title: '', content: '', tag: '', image: '' });
-          setFile(null);
-        });
+      const createdBlog = await doPostRequest(blogData, '/api/blogs');
+      if (createdBlog) {
+        setBlogs([...blogs, createdBlog]);
+        setNewBlog({ title: '', content: '', tag: '', image: '' });
+        setFile(null);
+      }
     }
   };
 
@@ -105,10 +92,13 @@ const BlogManagement: React.FC = () => {
     setFile(null);
   };
 
-  const handleDelete = (id: string) => {
-    fetch(`/api/blogs/${id}`, { method: 'DELETE' }).then(() =>
-      setBlogs(blogs.filter(blog => blog.id !== id)),
-    );
+  const handleDelete = async (id: string) => {
+    try {
+      await axios.delete(`/api/blogs/${id}`);
+      setBlogs(blogs.filter(blog => blog.id !== id));
+    } catch (error) {
+      console.error('Error deleting blog:', error);
+    }
   };
 
   return (

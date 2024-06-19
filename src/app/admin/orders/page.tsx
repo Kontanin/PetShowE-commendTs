@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import {Breadcrumbs, BreadcrumbItem} from "@nextui-org/react";
+import Link from 'next/link';
 type Order = {
   id: string;
   shippingFee?: boolean;
@@ -68,8 +69,10 @@ const OrderManagement: React.FC = () => {
     <div>
       <h2 className="text-3xl font-bold mb-6">Order Management</h2>
       <Breadcrumbs>
-      <BreadcrumbItem>Admin</BreadcrumbItem>
-      <BreadcrumbItem>Orders</BreadcrumbItem>
+      <BreadcrumbItem>
+      <Link href="/admin">admin</Link>
+      </BreadcrumbItem>
+      <BreadcrumbItem>     <Link href="/admin/orders">orders</Link></BreadcrumbItem>
     </Breadcrumbs>
       <table className="min-w-full bg-white">
         <thead>

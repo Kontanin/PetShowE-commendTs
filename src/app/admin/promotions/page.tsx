@@ -8,11 +8,12 @@ import PromotionList from '@/components/Promotion/PromotionList';
 import { Promotion, PromotionType } from '@/types/promotionTypes';
 import doPostRequest from '@/utils/doPostRequest';
 import doDeleteRequest from '@/utils/doDeleteRequest';
-import doUpdateRequest from '@/utils/doUpdateRequest'; // Import the update request utility
-
+import doUpdateRequest from '@/utils/doUpdateRequest'; // Import the update by ID request utility
+import {Breadcrumbs, BreadcrumbItem} from "@nextui-org/react";
 // Import JSON files
 import productsData from '@/data/products.json';
 import promotionsData from '@/data/promotions.json';
+import Link from 'next/link';
 
 const MarketingManagement: React.FC = () => {
   const [promotions, setPromotions] = useState<Promotion[]>([]);
@@ -101,7 +102,13 @@ const MarketingManagement: React.FC = () => {
   return (
     <div className="pt-32 pb-32 flex items-center justify-center bg-gray-100">
       <div className="bg-white rounded-lg shadow-lg max-w-4xl w-full p-8">
-        <h2 className="text-3xl font-bold mb-6 text-center">Marketing Management</h2>
+        <h2 className="text-3xl font-bold mb-6 text-center">Promotions Management</h2>
+        <Breadcrumbs>
+      <BreadcrumbItem>
+      <Link href="/admin">admin</Link>
+      </BreadcrumbItem>
+      <BreadcrumbItem>     <Link href="/admin/promotions">promotions</Link></BreadcrumbItem>
+    </Breadcrumbs>
         <PromotionForm
           products={productsData}
           initialPromotion={currentPromotion}

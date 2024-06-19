@@ -1,20 +1,19 @@
-// src/utils/doUpdateRequest.ts
-
+// @/utils/doUpdateByUserIdRequest.ts
 import axios from 'axios';
 
 async function doUpdateRequest(payload: object, path: string) {
   try {
     const res = await axios.patch(path, payload, {
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'multipart/form-data',
       },
     });
-    const body = res.data;
-    return body;
+    return res.data;
   } catch (e) {
-    console.error(e);
-    return false;
+    console.error('Error in doUpdateRequest:', e);
+    throw e;
   }
 }
 
 export default doUpdateRequest;
+

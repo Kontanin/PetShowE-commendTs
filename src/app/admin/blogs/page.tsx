@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { BlogPost } from '@/types/blogType';
-import axios from 'axios';
-import  doPostRequest  from '@/utils/doPostRequest'
-import  doUpdateRequest  from '@/utils/doUpdateRequest'
+import doPostRequest from '@/utils/doPostRequest';
+import doDeleteRequest from '@/utils/doDeleteRequest';
+import doUpdateRequest from '@/utils/doUpdateRequest';
+
 const BlogManagement: React.FC = () => {
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [selectedBlog, setSelectedBlog] = useState<BlogPost | null>(null);
@@ -19,9 +21,9 @@ const BlogManagement: React.FC = () => {
 
   useEffect(() => {
     // Fetch blogs from the backend API
-    fetch('/api/blogs')
-      .then(response => response.json())
-      .then(data => setBlogs(data));
+    doPostRequest({}, '/api/blogs')
+      .then(data => setBlogs(data))
+      .catch(error => console.error('Error fetching blogs:', error));
   }, []);
 
   const handleInputChange = (
@@ -52,12 +54,8 @@ const BlogManagement: React.FC = () => {
       formData.append('image', file);
 
       try {
-        const response = await axios.post('/upload', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-        imageUrl = response.data.imageUrl;
+        const response = await doPostRequest(formData, '/upload');
+        imageUrl = response.imageUrl;
       } catch (error) {
         console.error('Error uploading image:', error);
         return;
@@ -77,7 +75,7 @@ const BlogManagement: React.FC = () => {
       }
     } else {
       // Create new blog
-      const createdBlog = await doPostRequest(blogData, '/api/blogs');
+      const createdBlog = await doPostRequest(blogData, '/api/create-blog');
       if (createdBlog) {
         setBlogs([...blogs, createdBlog]);
         setNewBlog({ title: '', content: '', tag: '', image: '' });
@@ -93,11 +91,11 @@ const BlogManagement: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    try {
-      await axios.delete(`/api/blogs/${id}`);
+    const result = await doDeleteRequest(`/api/blogs/${id}`);
+    if (result) {
       setBlogs(blogs.filter(blog => blog.id !== id));
-    } catch (error) {
-      console.error('Error deleting blog:', error);
+    } else {
+      console.error('Failed to delete blog');
     }
   };
 
@@ -139,7 +137,9 @@ const BlogManagement: React.FC = () => {
         />
         {fileError && <p className="text-red-500 mb-2">{fileError}</p>}
         {newBlog.image && (
-          <img src={newBlog.image} alt="Uploaded" className="w-full mb-2" />
+          <div className="w-full mb-2 relative" style={{ height: '300px' }}>
+            <Image src={newBlog.image} alt="Uploaded" layout="fill" objectFit="cover" />
+          </div>
         )}
         <button
           onClick={handleSave}
@@ -158,7 +158,9 @@ const BlogManagement: React.FC = () => {
             </p>
             <p>{blog.content}</p>
             {blog.image && (
-              <img src={blog.image} alt={blog.title} className="w-full mb-2" />
+              <div className="w-full mb-2 relative" style={{ height: '300px' }}>
+                <Image src={blog.image} alt={blog.title} layout="fill" objectFit="cover" />
+              </div>
             )}
             <div className="flex space-x-4 mt-2">
               <button

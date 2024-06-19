@@ -19,6 +19,7 @@ const AddProductPage: React.FC = () => {
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [userId, setUserId] = useState<string>(''); // Assume we get this from the context or props
 
   useEffect(() => {
     // Fetch products from backend API

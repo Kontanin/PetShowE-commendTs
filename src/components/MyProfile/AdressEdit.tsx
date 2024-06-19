@@ -1,10 +1,10 @@
-// src/pages/AddressEdit.tsx
-
 'use client';
 import React, { useState } from 'react';
 import doUpdateRequest from '@/utils/doUpdateRequest';
+import { UserStore } from '@/store/UserStore';
 
 export const AddressEdit = () => {
+  const { id } = UserStore();
   const [formData, setFormData] = useState({
     address: '',
     subdistrict: '',
@@ -24,11 +24,11 @@ export const AddressEdit = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Send data to the server
-    const result = await doUpdateRequest(formData, '/api/address');
-    if (result) {
+    try {
+      const result = await doUpdateRequest(formData, `/api/edit-profile/${id}`);
       console.log('Address updated successfully', result);
-    } else {
-      console.error('Failed to update address');
+    } catch (error) {
+      console.error('Failed to update address', error);
     }
   };
 

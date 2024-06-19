@@ -4,7 +4,7 @@ import axios from 'axios';
 
 async function doDeleteRequest(path: string) {
   try {
-    const res = await axios.delete(path, {
+    const res = await axios.patch(path, {
       headers: {
         'Content-Type': 'application/json',
       },

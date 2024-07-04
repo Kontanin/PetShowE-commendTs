@@ -1,18 +1,24 @@
+'use client';
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
+import doUpdateRequest from '@/utils/doUpdateRequest';
+import { UserStore } from '@/store/UserStore';
 
 export const ProfileEdit = () => {
+  const { id } = UserStore();
   const initialProfile = {
     id: 1,
     name: 'John Doe',
     email: 'john.doe@example.com',
     bio: 'Software developer at XYZ Company.',
-    picture: '', // Initial picture URL or base64 string
+    image: '', // Initial image URL or base64 string
     phone: '', // Initial phone number
   };
 
   const [profile, setProfile] = useState(initialProfile);
   const [isChanged, setIsChanged] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | ArrayBuffer | null>(null);
+  const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
     // Check if the current profile is different from the initial profile
@@ -20,7 +26,7 @@ export const ProfileEdit = () => {
       profile.name !== initialProfile.name ||
       profile.email !== initialProfile.email ||
       profile.bio !== initialProfile.bio ||
-      profile.picture !== initialProfile.picture ||
+      profile.image !== initialProfile.image ||
       profile.phone !== initialProfile.phone;
 
     setIsChanged(hasChanges);
@@ -35,24 +41,32 @@ export const ProfileEdit = () => {
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
-        setProfile({
-          ...profile,
-          picture: reader.result as string
-        });
+        setFile(selectedFile);
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(selectedFile);
     }
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Here you can handle the form submission, e.g., send data to the server.
-    console.log('Profile updated:', profile);
+    const formDataToSend = new FormData();
+    Object.entries(profile).forEach(([key, value]) => {
+      formDataToSend.append(key, value as string);
+    });
+    if (file) {
+      formDataToSend.append('image', file);
+    }
+    const result = await doUpdateRequest(formDataToSend, `/api/edit-profile/${id}`);
+    if (result) {
+      console.log('Profile updated successfully', result);
+    } else {
+      console.error('Failed to update profile');
+    }
   };
 
   return (
@@ -121,15 +135,27 @@ export const ProfileEdit = () => {
         </form>
       </div>
       <div className="w-1/3 text-center flex flex-col items-center justify-center">
-        <img
-          className="w-96 h-96 overflow-hidden mb-4 rounded-full shadow-lg"
-          src={imagePreview ? (imagePreview as string) : "/mnt/data/image.png"}
-          alt="Profile Picture"
-        />
+        {imagePreview ? (
+          <Image
+            src={imagePreview as string}
+            alt="Profile Image"
+            width={200}
+            height={200}
+            className="w-96 h-96 overflow-hidden mb-4 rounded-full shadow-lg"
+          />
+        ) : (
+          <Image
+            src="/mnt/data/image.png"
+            alt="Profile Image"
+            width={200}
+            height={200}
+            className="w-96 h-96 overflow-hidden mb-4 rounded-full shadow-lg"
+          />
+        )}
         <input
           type="file"
-          id="picture"
-          name="picture"
+          id="image"
+          name="image"
           accept="image/*"
           onChange={handleImageChange}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg"

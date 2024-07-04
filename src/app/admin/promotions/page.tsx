@@ -6,10 +6,14 @@ import React, { useState, useEffect } from 'react';
 import PromotionForm from '@/components/Promotion/PromotionForm';
 import PromotionList from '@/components/Promotion/PromotionList';
 import { Promotion, PromotionType } from '@/types/promotionTypes';
-
+import doPostRequest from '@/utils/doPostRequest';
+import doDeleteRequest from '@/utils/doDeleteRequest';
+import doUpdateRequest from '@/utils/doUpdateRequest'; // Import the update by ID request utility
+import {Breadcrumbs, BreadcrumbItem} from "@nextui-org/react";
 // Import JSON files
 import productsData from '@/data/products.json';
 import promotionsData from '@/data/promotions.json';
+import Link from 'next/link';
 
 const MarketingManagement: React.FC = () => {
   const [promotions, setPromotions] = useState<Promotion[]>([]);
@@ -44,11 +48,16 @@ const MarketingManagement: React.FC = () => {
     setIsEditing(true);
   };
 
-  const handleDelete = (id: string) => {
-    setPromotions(promotions.filter(p => p.id !== id));
+  const handleDelete = async (id: string) => {
+    const result = await doDeleteRequest(`/api/promotions/${id}`);
+    if (result) {
+      setPromotions(promotions.filter(p => p.id !== id));
+    } else {
+      console.error('Failed to delete promotion');
+    }
   };
 
-  const handleSubmit = (promotion: Promotion) => {
+  const handleSubmit = async (promotion: Promotion) => {
     let updatedTargets: string[] = [];
     if (promotion.targets.some(target => productsData.some(product => product.company === target))) {
       const companyProducts = productsData.filter(product => promotion.targets.includes(product.company));
@@ -63,11 +72,22 @@ const MarketingManagement: React.FC = () => {
     const updatedPromotion = { ...promotion, targets: updatedTargets };
 
     if (isEditing) {
-      setPromotions(promotions.map(p => p.id === promotion.id ? updatedPromotion : p));
-      setIsEditing(false);
+      const result = await doUpdateRequest(updatedPromotion, `/api/promotions/${promotion.id}`);
+      if (result) {
+        setPromotions(promotions.map(p => p.id === promotion.id ? result : p));
+        setIsEditing(false);
+      } else {
+        console.error('Failed to update promotion');
+      }
     } else {
-      setPromotions([...promotions, { ...updatedPromotion, id: (promotions.length + 1).toString() }]);
+      const result = await doPostRequest(updatedPromotion, '/api/promotions');
+      if (result) {
+        setPromotions([...promotions, { ...result, id: (promotions.length + 1).toString() }]);
+      } else {
+        console.error('Failed to create promotion');
+      }
     }
+
     setCurrentPromotion({
       id: '',
       name: '',
@@ -82,7 +102,13 @@ const MarketingManagement: React.FC = () => {
   return (
     <div className="pt-32 pb-32 flex items-center justify-center bg-gray-100">
       <div className="bg-white rounded-lg shadow-lg max-w-4xl w-full p-8">
-        <h2 className="text-3xl font-bold mb-6 text-center">Marketing Management</h2>
+        <h2 className="text-3xl font-bold mb-6 text-center">Promotions Management</h2>
+        <Breadcrumbs>
+      <BreadcrumbItem>
+      <Link href="/admin">admin</Link>
+      </BreadcrumbItem>
+      <BreadcrumbItem>     <Link href="/admin/promotions">promotions</Link></BreadcrumbItem>
+    </Breadcrumbs>
         <PromotionForm
           products={productsData}
           initialPromotion={currentPromotion}

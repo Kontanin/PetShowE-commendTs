@@ -1,7 +1,10 @@
 'use client';
-import { useState } from 'react';
+import React, { useState } from 'react';
+import doUpdateRequest from '@/utils/doUpdateRequest';
+import { UserStore } from '@/store/UserStore';
 
 export const AddressEdit = () => {
+  const { id } = UserStore();
   const [formData, setFormData] = useState({
     address: '',
     subdistrict: '',
@@ -10,7 +13,7 @@ export const AddressEdit = () => {
     city: '',
   });
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -18,9 +21,15 @@ export const AddressEdit = () => {
     });
   };
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
+    // Send data to the server
+    try {
+      const result = await doUpdateRequest(formData, `/api/edit-profile/${id}`);
+      console.log('Address updated successfully', result);
+    } catch (error) {
+      console.error('Failed to update address', error);
+    }
   };
 
   return (

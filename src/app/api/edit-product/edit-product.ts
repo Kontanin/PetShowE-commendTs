@@ -1,20 +1,35 @@
-import { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
-
-export async function POST(req: NextRequest) {
+import { NextRequest, NextResponse } from 'next/server';
+interface Params {
+  id: string;
+}
+export async function PATCH(req: NextRequest,context: { params: Params }) {
+  const { id } = context.params;
   const body = await req.json();
-  const res = await fetch(
-    'http://localhost:5000/Order/Create',
+  if (!id) {
+    return NextResponse.json({ message: 'ID is required' }, { status: 400 });
+  }
 
-    {
-      method: 'POST',
+  try {
+    const res = await fetch(`http://localhost:5000/product/edit/${id}`, {
+      method: 'PATCH',
       body: JSON.stringify(body),
       headers: {
         'Content-Type': 'application/json',
       },
-    },
-  );
+    });
 
-  const data = await res.json();
-  return NextResponse.json(data);
+    const data = await res.json();
+
+    if (!res.ok) {
+      return NextResponse.json({ message: 'Failed to update the blog', error: data }, { status: res.status });
+    }
+
+    return NextResponse.json(data);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return NextResponse.json({ message: 'Internal server error', error: error.message }, { status: 500 });
+    } else {
+      return NextResponse.json({ message: 'An unknown error occurred' }, { status: 500 });
+    }
+  }
 }

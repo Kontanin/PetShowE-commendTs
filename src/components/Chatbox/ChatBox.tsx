@@ -3,9 +3,17 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import classNames from 'classnames';
-
+import { UserStore } from '@/store/UserStore';
+import Cookies from 'js-cookie';
+import { user } from '@nextui-org/react';
 const endpoint = 'http://localhost:5000';
-const socket = io(endpoint);
+const token = Cookies.get('authToken');
+
+const socket = io(endpoint, {
+  auth: {
+    token: token,
+  },
+});
 
 interface User {
   id: string;
@@ -14,7 +22,7 @@ interface User {
 }
 
 interface Message {
-  id: number;
+  UserId: string;
   content: string;
   user: User | null;
   userId: string;
@@ -22,6 +30,7 @@ interface Message {
 }
 
 const ChatBox: React.FC = () => {
+  const { id } = UserStore();
   const currentUserID = 'user123'; // Replace with the actual logged-in user ID
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -53,7 +62,7 @@ const ChatBox: React.FC = () => {
   const handleSendMessage = () => {
     if (input.trim()) {
       const newMessage: Message = {
-        id: Date.now(),
+        UserId: id,
         content: input,
         user: null,
         userId: currentUserID,
@@ -70,7 +79,7 @@ const ChatBox: React.FC = () => {
         {isOpen && (
           <div className="bg-white shadow-lg rounded-lg p-4 w-80 h-96 flex flex-col">
             <div className="flex justify-between items-center border-b pb-2 mb-2">
-              <h2 className="text-lg font-semibold">Chat</h2>
+              <h2 className="text-lg font-semibold">Chat with Admin</h2>
               <button
                 onClick={toggleChat}
                 className="text-gray-500 hover:text-gray-700"
@@ -82,7 +91,7 @@ const ChatBox: React.FC = () => {
               <div className="text-gray-600 text-sm flex flex-col space-y-2">
                 {messages.map(message => (
                   <div
-                    key={message.id}
+                    key={message.createdAt}
                     className={classNames(
                       'p-2 rounded-lg max-w-xs',
                       message.userId === currentUserID
@@ -111,7 +120,7 @@ const ChatBox: React.FC = () => {
               />
               <button
                 onClick={handleSendMessage}
-                className="ml-2 bg-blue-500 text-white rounded-lg px-3 py-2 hover:bg-blue-600 text-sm"
+                className="ml-2 bg-orange-600 text-white rounded-lg px-3 py-2 text-sm"
               >
                 Send
               </button>
@@ -120,9 +129,9 @@ const ChatBox: React.FC = () => {
         )}
         <button
           onClick={toggleChat}
-          className={`bg-blue-500 text-white rounded-full p-3 shadow-lg hover:bg-blue-600 focus:outline-none ${isOpen ? 'hidden' : ''}`}
+          className={`bg-orange-600 text-white rounded-full p-3 shadow-lg focus:outline-none ${isOpen ? 'hidden' : ''}`}
         >
-          Chat
+          Chat with Admin
         </button>
       </div>
     </div>

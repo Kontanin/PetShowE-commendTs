@@ -3,8 +3,8 @@
 
 import { useEffect, useState } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
-import FilterSidebar from '@/components/productslice/FilterSidebar';
-import ProductGrid from '@/components/productslice/ProductGrid';
+import FilterSidebar from '@/components/Productslice/FilterSidebar';
+import ProductGrid from '@/components/Productslice/ProductGrid';
 import products from '@/data/products.json';
 import promotionsJson from '@/data/promotions.json';
 import { Promotion, PromotionType } from '@/types/promotionTypes';

@@ -1,19 +1,20 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import io from 'socket.io-client';
+import io, { Socket } from 'socket.io-client';
 import classNames from 'classnames';
 import { UserStore } from '@/store/UserStore';
 import Cookies from 'js-cookie';
-import { user } from '@nextui-org/react';
-const endpoint = 'http://localhost:5000';
-const token = Cookies.get('authToken');
 
-const socket = io(endpoint, {
-  auth: {
-    token: token,
-  },
-});
+const endpoint = 'http://localhost:5000';
+
+const initializeSocket = (token: string): Socket => {
+  return io(endpoint, {
+    auth: {
+      token: token,
+    },
+  });
+};
 
 interface User {
   id: string;
@@ -22,36 +23,54 @@ interface User {
 }
 
 interface Message {
-  UserId: string;
+  userId: string;
   content: string;
   user: User | null;
-  userId: string;
   createdAt: string;
 }
 
 const ChatBox: React.FC = () => {
-  const { id } = UserStore();
-  const currentUserID = 'user123'; // Replace with the actual logged-in user ID
+  const { id: currentUserID } = UserStore(); // Get the user ID from UserStore
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
+  const [offset, setOffset] = useState(0);
+  const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
+    const token = Cookies.get('authToken') || 'default_token'; // Use a default value or handle token retrieval more robustly
+    const socketInstance = initializeSocket(token);
+
+    // Error handling
+    socketInstance.on('connect_error', error => {
+      console.error('Connection error:', error);
+    });
+
+    socketInstance.on('error', error => {
+      console.error('Socket error:', error);
+    });
+
+    // Load initial messages
+    socketInstance.emit('load-more-messages', { offset: 0 });
+
     // Handle chat history
-    socket.on('chat history', (history: Message[]) => {
-      console.log('Received chat history:', history);
-      setMessages(history);
+    socketInstance.on('previousMessages', (history: Message[]) => {
+      setMessages(prevMessages => [...history, ...prevMessages]);
     });
 
     // Handle new chat messages
-    socket.on('new-message', (msg: Message) => {
-      console.log('Received new message:', msg);
-      setMessages(prevMessages => [...prevMessages, msg]);
+    socketInstance.on('new-message', (msg: Message) => {
+      setMessages(prevMessages => [msg, ...prevMessages]);
     });
 
+    setSocket(socketInstance);
+
     return () => {
-      socket.off('chat history');
-      socket.off('new-message');
+      socketInstance.off('connect_error');
+      socketInstance.off('error');
+      socketInstance.off('previousMessages');
+      socketInstance.off('new-message');
+      socketInstance.disconnect();
     };
   }, []);
 
@@ -60,16 +79,35 @@ const ChatBox: React.FC = () => {
   };
 
   const handleSendMessage = () => {
-    if (input.trim()) {
+    if (input.trim() && socket) {
       const newMessage: Message = {
-        UserId: id,
+        userId: currentUserID, // Use the user ID from UserStore
         content: input,
         user: null,
-        userId: currentUserID,
         createdAt: new Date().toISOString(),
       };
-      socket.emit('sent-message', newMessage);
+      socket.emit('sent-message', newMessage, (error?: string) => {
+        if (error) {
+          console.error('Send message error:', error);
+        }
+      });
       setInput('');
+    }
+  };
+
+  const loadMoreMessages = () => {
+    const newOffset = offset + 100;
+    setOffset(newOffset);
+    if (socket) {
+      socket.emit(
+        'load-more-messages',
+        { offset: newOffset },
+        (error?: string) => {
+          if (error) {
+            console.error('Load more messages error:', error);
+          }
+        },
+      );
     }
   };
 
@@ -88,21 +126,19 @@ const ChatBox: React.FC = () => {
               </button>
             </div>
             <div className="flex-1 overflow-y-auto">
+              <button onClick={loadMoreMessages} className="text-blue-500">
+                Load More Messages
+              </button>
               <div className="text-gray-600 text-sm flex flex-col space-y-2">
-                {messages.map(message => (
+                {messages.map((message, index) => (
                   <div
-                    key={message.createdAt}
+                    key={index}
                     className={classNames(
-                      'p-2 rounded-lg max-w-xs',
+                      'p-2 rounded-lg max-w-xs break-words',
                       message.userId === currentUserID
-                        ? 'bg-blue-500 text-white self-end'
-                        : 'bg-gray-200 text-black self-start',
+                        ? 'bg-blue-500 text-white self-end text-right'
+                        : 'bg-gray-200 text-black self-start text-left',
                     )}
-                    style={{
-                      wordWrap: 'break-word',
-                      textAlign:
-                        message.userId === currentUserID ? 'right' : 'left',
-                    }}
                   >
                     {message.content}
                   </div>
@@ -115,7 +151,7 @@ const ChatBox: React.FC = () => {
                 placeholder="Type a message..."
                 value={input}
                 onChange={e => setInput(e.target.value)}
-                onKeyPress={e => e.key === 'Enter' && handleSendMessage()}
+                onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
                 className="flex-grow border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
               />
               <button

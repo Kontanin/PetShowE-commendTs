@@ -7,7 +7,7 @@ import items from '@/data/OrderProduct.json';
 import { useRouter } from 'next/navigation';
 import doPostRequest from '@/utils/doPostRequest';
 import { OrderProduct, OrderPayload } from '@/types/OrderProductType';
-
+import { CartStore } from '@/store/CartStore';
 import Link from 'next/link';
 
 const groupBy = <T,>(array: T[], key: keyof T): Record<string, T[]> => {
@@ -25,10 +25,11 @@ const groupBy = <T,>(array: T[], key: keyof T): Record<string, T[]> => {
 };
 
 const ShoppingBag = () => {
+  const Order = CartStore(state => state.cart);
   const router = useRouter();
-  const groupedItems = groupBy(items, 'company');
+  const groupedItems = groupBy(Order, 'company');
   const [itemQuantities, setItemQuantities] = useState(
-    items.map(item => ({ id: item.id, quantity: item.quantity })),
+    Order.map(item => ({ id: item.id, quantity: item.quantity })),
   );
 
   const handleQuantityChange = (id: string, quantity: number) => {
@@ -44,11 +45,11 @@ const ShoppingBag = () => {
     return item ? item.quantity : 1;
   };
 
-  const subtotal = items.reduce(
+  const subtotal = Order.reduce(
     (sum, item) => sum + item.unitPrice * getItemQuantity(item.id),
     0,
   );
-  const totalShipping = items.reduce(
+  const totalShipping = Order.reduce(
     (sum, item) => sum + (item.freeShipping ? 0 : 15),
     0,
   ); // Assuming a flat shipping rate for simplicity
@@ -59,8 +60,8 @@ const ShoppingBag = () => {
       userId: 'some-user-id', // replace with actual user ID
       items: itemQuantities.map(i => ({ id: i.id, quantity: i.quantity })),
       totalAmount: total,
-      shippingFee:20
-      ,tax:20
+      shippingFee: 20,
+      tax: 20,
     };
 
     const response = await doPostRequest(payload, '/api/create-order');

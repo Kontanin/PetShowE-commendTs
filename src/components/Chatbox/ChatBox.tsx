@@ -36,6 +36,19 @@ const ChatBox: React.FC = () => {
   const [input, setInput] = useState('');
   const [offset, setOffset] = useState(0);
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [newMessageCount, setNewMessageCount] = useState(0);
+
+  const disconnectSocket = () => {
+    if (socket) {
+      // ยกเลิกการสมัครรับฟังเหตุการณ์ก่อน
+      socket.off('connect_error');
+      socket.off('error');
+      socket.off('previousMessages');
+      socket.off('new-message');
+      socket.disconnect();
+      console.log('Socket disconnected');
+    }
+  };
 
   useEffect(() => {
     const token = Cookies.get('authToken') || 'default_token'; // Use a default value or handle token retrieval more robustly
@@ -46,36 +59,32 @@ const ChatBox: React.FC = () => {
       console.error('Connection error:', error);
     });
 
-    socketInstance.on('error', error => {
-      console.error('Socket error:', error);
-    });
-
-    // Load initial messages
-    socketInstance.emit('load-more-messages', { offset: 0 });
-
-    // Handle chat history
-    socketInstance.on('previousMessages', (history: Message[]) => {
-      setMessages(prevMessages => [...history, ...prevMessages]);
-    });
-
     // Handle new chat messages
     socketInstance.on('new-message', (msg: Message) => {
       setMessages(prevMessages => [msg, ...prevMessages]);
+      if (!isOpen) {
+        setNewMessageCount(prevCount => prevCount + 1);
+      }
     });
+
+    // Mock the notification count initialization
+    setNewMessageCount(2);
 
     setSocket(socketInstance);
 
+    window.addEventListener('beforeunload', disconnectSocket);
+
     return () => {
-      socketInstance.off('connect_error');
-      socketInstance.off('error');
-      socketInstance.off('previousMessages');
-      socketInstance.off('new-message');
-      socketInstance.disconnect();
+      window.removeEventListener('beforeunload', disconnectSocket);
+      disconnectSocket();
     };
-  }, []);
+  }, [isOpen]);
 
   const toggleChat = () => {
     setIsOpen(!isOpen);
+    if (!isOpen) {
+      setNewMessageCount(0);
+    }
   };
 
   const handleSendMessage = () => {
@@ -165,9 +174,14 @@ const ChatBox: React.FC = () => {
         )}
         <button
           onClick={toggleChat}
-          className={`bg-orange-600 text-white rounded-full p-3 shadow-lg focus:outline-none ${isOpen ? 'hidden' : ''}`}
+          className={`relative bg-orange-600 text-white rounded-full p-3 shadow-lg focus:outline-none ${isOpen ? 'hidden' : ''}`}
         >
           Chat with Admin
+          {newMessageCount > 0 && (
+            <span className="absolute top-0 right-0 bg-red-500 text-white rounded-full px-2 py-1 text-xs">
+              {newMessageCount}
+            </span>
+          )}
         </button>
       </div>
     </div>

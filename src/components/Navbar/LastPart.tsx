@@ -36,13 +36,13 @@ export default function Lastpart() {
     <NavbarContent justify="end">
       <Popover placement="bottom">
         <PopoverTrigger>
-          <Button className="bg-red-500 hover:bg-red-600 rounded-full p-2">
+          <Button className="bg-orange-500 rounded-full p-2">
             <Badge
               content={Order.length}
               color="primary"
               placement="bottom-right"
             >
-              <BsBag size={30} />
+              <BsBag size={25} />
             </Badge>
           </Button>
         </PopoverTrigger>

@@ -32,11 +32,12 @@ function Login() {
     try {
       let result = await doPostRequest(data, '/api/login');
 
-      if (result.token) {
-        Cookies.set('authToken', result.token, { expires: 7 });
+      if (result.accessToken) {
+        Cookies.set('authToken', result.accessToken, { expires: 7 });
         setUser(result);
         setIsAuthenticated(true);
         router.push('/');
+        console.log('success');
       } else {
         setErrorMessage('Invalid email or password. Please try again.');
       }

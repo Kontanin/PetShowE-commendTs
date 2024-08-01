@@ -18,7 +18,12 @@ const AddProductPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>({
+    id: '',
+    name: '',
+    description: '',
+    price: 0
+  });
   const [userId, setUserId] = useState<string>(''); // Assume we get this from the context or props
 
   useEffect(() => {

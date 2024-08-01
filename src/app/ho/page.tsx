@@ -17,7 +17,7 @@ const ChatLayout: React.FC = () => {
   interface ChatDetail {
     id: number;
     participants: string[];
-    messages: Message[];
+    messages: string[];
   }
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [chats,setchat] = useState<Chat[]>(data);

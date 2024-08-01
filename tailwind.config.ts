@@ -16,6 +16,9 @@ const config: Config = {
         amber: colors.amber,
         // Add more colors as needed
       },
+      height: {
+        '120': '120px',
+      },
     },
   },
   plugins: [

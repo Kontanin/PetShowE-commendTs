@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import doPostRequest from '@/utils/doPostRequest';
-import { z } from 'zod';
 import InputWithLabel from '@/components/Form/InputWithLabel';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Cookies from 'js-cookie';

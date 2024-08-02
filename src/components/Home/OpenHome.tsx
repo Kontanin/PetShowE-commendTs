@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-
+import Image from 'next/image';
 const pugImage = '/home/1.jpg';
 
 const PetShopHero = () => {
@@ -30,12 +30,16 @@ const PetShopHero = () => {
 
           </div>
         </div>
+        
         <div className="w-1/2 h-full">
-          <img
-            src={pugImage}
-            alt="Pug in Sweater"
-            className="object-cover w-full h-full"
-          />
+        <Image
+      src={pugImage}
+      width={500}
+      height={500}
+      alt="Picture of the author"
+        className="object-cover w-full h-full"
+    />
+
         </div>
       </div>
     </div>

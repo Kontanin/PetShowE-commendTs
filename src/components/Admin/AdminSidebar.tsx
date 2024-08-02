@@ -48,6 +48,14 @@ const AdminSidebar: React.FC = () => {
             </div>
           </Link>
         </li>
+                <li className="mb-4">
+          <Link href="/admin/massage">
+            <div className="py-2 px-4 hover:bg-yellow-600 rounded transition duration-200">
+              <h2 className="text-lg font-semibold">Message Management</h2>
+              <p className="text-sm">Manage all Chat and message  from this section.</p>
+            </div>
+          </Link>
+        </li>
       </ul>
     </nav>
   );

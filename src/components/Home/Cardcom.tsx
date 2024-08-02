@@ -39,7 +39,7 @@ export default function CardCom() {
           <CardBody className="p-0 flex flex-row">
             <Link href={'/blog/' + item.id}>
               <Image
-                alt="Blog image"
+                alt={item.content}
                 className="object-cover"
                 height={250}
                 src={item.image}

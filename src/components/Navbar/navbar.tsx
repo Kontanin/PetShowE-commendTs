@@ -29,7 +29,7 @@ export default function NavbarMain() {
             alt="Main Icon"
             className="m-4"
           ></Image>
-          <p className="font-bold  text-black">Pet shop</p>
+          {/* <p className="font-bold  text-black">Pet shop</p> */}
         </Link>
       </NavbarBrand>
 
@@ -59,5 +59,7 @@ export default function NavbarMain() {
       {/* end part  */}
       <Lastpart />
     </Navbar>
+
+
   );
 }

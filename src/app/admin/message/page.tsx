@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Input, Avatar } from '@nextui-org/react';
 import { Breadcrumbs, BreadcrumbItem } from '@nextui-org/react';
 import Link from 'next/link';
@@ -7,8 +7,8 @@ import { UserStore } from '@/store/UserStore';
 import io, { Socket } from 'socket.io-client';
 import axios from 'axios';
 import { endpoint } from '@/components/Chatbox/Chatbox';
-import { toast } from 'react-toastify'; // Assuming you're using react-toastify for notifications
-
+import chat from './chat.json'
+// import { toast } from 'react-toastify'; // Assuming you're using react-toastify for notifications
 interface User {
   id: string;
   name: string;
@@ -27,69 +27,18 @@ interface Message {
 }
 
 const chats: Message[] = [
-  {
-    id: 1,
-    content: "Hey, how's it going?",
-    createdAt: '2024-08-01T12:34:56Z',
-    senderId: '1',
-    recipientId: '2',
-    isRead: false,
-    sender: {
-      id: '1',
-      name: 'John Doe',
-      email: 'john.doe@example.com',
-    },
-    recipient: {
-      id: '2',
-      name: 'Jane Smith',
-      email: 'jane.smith@example.com',
-    },
-  },
-  {
-    id: 2,
-    content: "I'm good, thanks for asking!",
-    createdAt: '2024-08-01T12:35:30Z',
-    senderId: '2',
-    recipientId: '1',
-    isRead: true,
-    sender: {
-      id: '2',
-      name: 'Jane Smith',
-      email: 'jane.smith@example.com',
-    },
-    recipient: {
-      id: '1',
-      name: 'John Doe',
-      email: 'john.doe@example.com',
-    },
-  },
-  {
-    id: 3,
-    content: 'Are you free for a call later?',
-    createdAt: '2024-08-01T13:00:00Z',
-    senderId: '1',
-    recipientId: '2',
-    isRead: false,
-    sender: {
-      id: '1',
-      name: 'John Doe',
-      email: 'john.doe@example.com',
-    },
-    recipient: {
-      id: '2',
-      name: 'Jane Smith',
-      email: 'jane.smith@example.com',
-    },
-  },
+  // ข้อมูล mockup ของแชท
 ];
 
 const ChatLayout: React.FC = () => {
   const { id } = UserStore();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedChat, setSelectedChat] = useState<Message>(chats[0]);
-  const [chatMessages, setChatMessages] = useState<Message[]>([selectedChat]);
-  const [socket, setSocket] = useState<Socket | null>(null);
+
+  const [socketConnected, setSocketConnected] = useState<boolean>(false);
   const [newMessage, setNewMessage] = useState<string>('');
+  const chatMessages = useRef<Message[]>([selectedChat]);
+  const socketRef = useRef<Socket | null>(null);
 
   const Chathandle = (chat: Message) => {
     setSelectedChat(chat);
@@ -121,19 +70,20 @@ const ChatLayout: React.FC = () => {
     try {
       const { data } = await axios.get(`/api/message/${selectedChat.id}`, {
         headers: {
-          Authorization: `Bearer `,
+          Authorization: `Bearer <your-token>`,
         },
       });
-      setChatMessages(data);
+      chatMessages.current = data;
     } catch (error) {
       console.error('Failed to load messages:', error);
-      toast.error('Failed to load messages');
     }
   };
 
   const sendMessage = async (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter' && newMessage) {
-      if (socket) socket.emit('stop typing', checkNotAdmin(selectedChat));
+      if (socketRef.current) {
+        socketRef.current.emit('stop typing', checkNotAdmin(selectedChat));
+      }
       try {
         const { data } = await axios.post(
           '/api/message',
@@ -144,27 +94,28 @@ const ChatLayout: React.FC = () => {
           {
             headers: {
               'Content-Type': 'application/json',
-              Authorization: `Bearer `,
+              Authorization: `Bearer <your-token>`,
             },
           }
         );
-        if (socket) socket.emit('new message', data);
-        setChatMessages([...chatMessages, data]);
+        if (socketRef.current) {
+          socketRef.current.emit('new message', data);
+        }
+        chatMessages.current = [...chatMessages.current, data];
         setNewMessage('');
       } catch (error) {
         console.error('Failed to send the message:', error);
-        toast.error('Failed to send the message');
       }
     }
   };
 
   useEffect(() => {
     const socketInstance = io(endpoint);
+    socketRef.current = socketInstance;
     socketInstance.emit('setup', id);
-    socketInstance.on('connected', () => console.log('Connected to socket'));
+    socketInstance.on('connected', () => setSocketConnected(true));
     socketInstance.on('typing', () => console.log('Typing...'));
     socketInstance.on('stop typing', () => console.log('Stopped typing'));
-    setSocket(socketInstance);
 
     return () => {
       socketInstance.disconnect();
@@ -176,20 +127,22 @@ const ChatLayout: React.FC = () => {
   }, [selectedChat]);
 
   useEffect(() => {
-    if (!socket) return;
+    if (!socketRef.current) return;
 
-    socket.on('message received', newMessageReceived => {
+    socketRef.current.on('message received', newMessageReceived => {
       if (selectedChat.id !== newMessageReceived.chatId) {
         console.warn('Received message for a different chat');
       } else {
-        setChatMessages(prevMessages => [...prevMessages, newMessageReceived]);
+        chatMessages.current = [...chatMessages.current, newMessageReceived];
       }
     });
 
     return () => {
-      socket.off('message received');
+      if (socketRef.current) {
+        socketRef.current.off('message received');
+      }
     };
-  }, [socket, selectedChat]);
+  }, [selectedChat]);
 
   return (
     <div className="flex h-[52rem]">
@@ -200,7 +153,6 @@ const ChatLayout: React.FC = () => {
               <Link href="/admin">admin</Link>
             </BreadcrumbItem>
             <BreadcrumbItem>
-              {' '}
               <Link href="/admin/orders">orders</Link>
             </BreadcrumbItem>
           </Breadcrumbs>
@@ -246,7 +198,7 @@ const ChatLayout: React.FC = () => {
           <div className="text-lg font-semibold">
             Chat with {checkNotYour(selectedChat)}
           </div>
-          {chatMessages.map(message => (
+          {chatMessages.current.map(message => (
             <div className="mt-4 space-y-2" key={message.id}>
               <div>
                 <div className="text-sm text-gray-500">

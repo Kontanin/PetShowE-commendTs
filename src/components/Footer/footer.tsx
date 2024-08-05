@@ -7,7 +7,7 @@ export default function Footer() {
   const { isAuthenticated } = UserStore();
   console.log(isAuthenticated, 'authentication');
   return (
-    <div>
+    <div className="p-2">
       {isAuthenticated && <ChatBox/>}
       <CardFooter/>
     </div>

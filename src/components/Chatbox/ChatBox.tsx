@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import { UserStore } from '@/store/UserStore';
 import Cookies from 'js-cookie';
 
-const endpoint = 'http://localhost:5000';
+export const endpoint = 'http://localhost:5000';
 
 const initializeSocket = (token: string): Socket => {
   return io(endpoint, {

@@ -1,9 +1,14 @@
 'use client';
-import React, { useEffect, useId, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Input, Avatar } from '@nextui-org/react';
 import { Breadcrumbs, BreadcrumbItem } from '@nextui-org/react';
 import Link from 'next/link';
 import { UserStore } from '@/store/UserStore';
+import io, { Socket } from 'socket.io-client';
+import axios from 'axios';
+import { endpoint } from '@/components/Chatbox/Chatbox';
+import { toast } from 'react-toastify'; // Assuming you're using react-toastify for notifications
+
 interface User {
   id: string;
   name: string;
@@ -20,63 +25,6 @@ interface Message {
   sender: User;
   recipient: User;
 }
-
-const Johnhistory: Message[] = [
-  {
-    id: 1,
-    content: "Hey, how's it going?",
-    createdAt: '2024-08-01T12:34:56Z',
-    senderId: '1',
-    recipientId: '2',
-    isRead: false,
-    sender: {
-      id: '1',
-      name: 'admin',
-      email: 'john.doe@example.com',
-    },
-    recipient: {
-      id: '2',
-      name: 'Jane Smith',
-      email: 'jane.smith@example.com',
-    },
-  },
-  {
-    id: 2,
-    content: "I'm good, thanks for asking!",
-    createdAt: '2024-08-01T12:35:30Z',
-    senderId: '2',
-    recipientId: '1',
-    isRead: true,
-    sender: {
-      id: '2',
-      name: 'Jane Smith',
-      email: 'jane.smith@example.com',
-    },
-    recipient: {
-      id: '1',
-      name: 'admin',
-      email: 'john.doe@example.com',
-    },
-  },
-  {
-    id: 3,
-    content: 'Are you free for a call later?',
-    createdAt: '2024-08-01T13:00:00Z',
-    senderId: '1',
-    recipientId: '2',
-    isRead: false,
-    sender: {
-      id: '1',
-      name: 'admin',
-      email: 'john.doe@example.com',
-    },
-    recipient: {
-      id: '5',
-      name: 'Jane Smith',
-      email: 'jane.smith@example.com',
-    },
-  },
-];
 
 const chats: Message[] = [
   {
@@ -128,172 +76,120 @@ const chats: Message[] = [
       email: 'john.doe@example.com',
     },
     recipient: {
-      id: '5',
+      id: '2',
       name: 'Jane Smith',
       email: 'jane.smith@example.com',
     },
   },
 ];
+
 const ChatLayout: React.FC = () => {
   const { id } = UserStore();
   const [searchQuery, setSearchQuery] = useState<string>('');
-  
+  const [selectedChat, setSelectedChat] = useState<Message>(chats[0]);
+  const [chatMessages, setChatMessages] = useState<Message[]>([selectedChat]);
+  const [socket, setSocket] = useState<Socket | null>(null);
+  const [newMessage, setNewMessage] = useState<string>('');
 
-  // Default to the first chat in the filtered list or keep the last selected chat
-  const [selectedChat, setSelectedChat] = useState<Message >(
-    chats[0],
-  );
-  const [chatMessage, setChatMessage] = useState<Message[]>([selectedChat])
-  const Chathandle= (chat:Message )=>{
-    setSelectedChat(chat)
-  }
+  const Chathandle = (chat: Message) => {
+    setSelectedChat(chat);
+  };
 
   const filteredChats = chats.filter(chat =>
     chat.sender.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  const checkNotAdmin=(selectedChat:Message)=>{
-    let  userId=selectedChat.senderId
-    if (selectedChat.sender.name="admin") {
-      userId=selectedChat.recipientId
+  const checkNotAdmin = (selectedChat: Message) => {
+    let userId = selectedChat.senderId;
+    if (selectedChat.sender.name === 'admin') {
+      userId = selectedChat.recipientId;
     }
-    return JSON.parse(userId);
-  }
-  const checkNotYour=(selectedChat:Message)=>{
-    let userName=selectedChat.sender.name
-    if (selectedChat.senderId=id) {
-      userName=selectedChat.recipient.name
-    }
+    return userId;
+  };
 
+  const checkNotYour = (selectedChat: Message) => {
+    let userName = selectedChat.sender.name;
+    if (selectedChat.senderId === id) {
+      userName = selectedChat.recipient.name;
+    }
     return userName;
-  }
+  };
 
+  const fetchMessages = async () => {
+    if (!selectedChat) return;
 
-  // const fetchMessages = async () => {
-  //   if (!selectedChat) return;
-
-  //   try {
-  //     const config = {
-  //       headers: {
-  //         Authorization: `Bearer ${user.token}`,
-  //       },
-  //     };
-
-  //     setLoading(true);
-
-  //     const { data } = await axios.get(
-  //       `/api/message/${selectedChat._id}`,
-  //       config
-  //     );
-  //     setMessages(data);
-  //     setLoading(false);
-
-  //     socket.emit("join chat", selectedChat._id);
-  //   } catch (error) {
-  //     toast({
-  //       title: "Error Occured!",
-  //       description: "Failed to Load the Messages",
-  //       status: "error",
-  //       duration: 5000,
-  //       isClosable: true,
-  //       position: "bottom",
-  //     });
-  //   }
-  // };
-
-  // const sendMessage = async (event) => {
-  //   if (event.key === "Enter" && newMessage) {
-  //     socket.emit("stop typing", selectedChat._id);
-  //     try {
-  //       const config = {
-  //         headers: {
-  //           "Content-type": "application/json",
-  //           Authorization: `Bearer ${user.token}`,
-  //         },
-  //       };
-  //       setNewMessage("");
-  //       const { data } = await axios.post(
-  //         "/api/message",
-  //         {
-  //           content: newMessage,
-  //           chatId: selectedChat,
-  //         },
-  //         config
-  //       );
-  //       socket.emit("new message", data);
-  //       setMessages([...messages, data]);
-  //     } catch (error) {
-  //       toast({
-  //         title: "Error Occured!",
-  //         description: "Failed to send the Message",
-  //         status: "error",
-  //         duration: 5000,
-  //         isClosable: true,
-  //         position: "bottom",
-  //       });
-  //     }
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   socket = io(ENDPOINT);
-  //   socket.emit("setup", user);
-  //   socket.on("connected", () => setSocketConnected(true));
-  //   socket.on("typing", () => setIsTyping(true));
-  //   socket.on("stop typing", () => setIsTyping(false));
-
-  //   // eslint-disable-next-line
-  // }, []);
-
-  // useEffect(() => {
-  //   fetchMessages();
-
-  //   selectedChatCompare = selectedChat;
-  //   // eslint-disable-next-line
-  // }, [selectedChat]);
-
-  // useEffect(() => {
-  //   socket.on("message recieved", (newMessageRecieved) => {
-  //     if (
-  //       !selectedChatCompare || // if chat is not selected or doesn't match current chat
-  //       selectedChatCompare._id !== newMessageRecieved.chat._id
-  //     ) {
-  //       if (!notification.includes(newMessageRecieved)) {
-  //         setNotification([newMessageRecieved, ...notification]);
-  //         setFetchAgain(!fetchAgain);
-  //       }
-  //     } else {
-  //       setMessages([...messages, newMessageRecieved]);
-  //     }
-  //   });
-  // });
-  useEffect(() => {
-    let newid = checkNotAdmin(selectedChat);
-  
-    fetch(`/api/data${newid}`)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
-        if (data) {
-          setChatMessage(data);
-        } else {
-          // Handle the case where data is null or undefined
-          console.warn('Received null or undefined data');
-          setChatMessage([]); // or set to an empty array or appropriate default
-        }
-      })
-      .catch(error => {
-        console.error('Fetch error:', error);
-        // Handle the error by showing an error message or setting state
-        setChatMessage([]); // or set to an empty array or appropriate default
+    try {
+      const { data } = await axios.get(`/api/message/${selectedChat.id}`, {
+        headers: {
+          Authorization: `Bearer `,
+        },
       });
-  }, [selectedChat]);
-  
+      setChatMessages(data);
+    } catch (error) {
+      console.error('Failed to load messages:', error);
+      toast.error('Failed to load messages');
+    }
+  };
 
+  const sendMessage = async (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter' && newMessage) {
+      if (socket) socket.emit('stop typing', checkNotAdmin(selectedChat));
+      try {
+        const { data } = await axios.post(
+          '/api/message',
+          {
+            content: newMessage,
+            chatId: selectedChat.id,
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer `,
+            },
+          }
+        );
+        if (socket) socket.emit('new message', data);
+        setChatMessages([...chatMessages, data]);
+        setNewMessage('');
+      } catch (error) {
+        console.error('Failed to send the message:', error);
+        toast.error('Failed to send the message');
+      }
+    }
+  };
+
+  useEffect(() => {
+    const socketInstance = io(endpoint);
+    socketInstance.emit('setup', id);
+    socketInstance.on('connected', () => console.log('Connected to socket'));
+    socketInstance.on('typing', () => console.log('Typing...'));
+    socketInstance.on('stop typing', () => console.log('Stopped typing'));
+    setSocket(socketInstance);
+
+    return () => {
+      socketInstance.disconnect();
+    };
+  }, [id]);
+
+  useEffect(() => {
+    fetchMessages();
+  }, [selectedChat]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on('message received', newMessageReceived => {
+      if (selectedChat.id !== newMessageReceived.chatId) {
+        console.warn('Received message for a different chat');
+      } else {
+        setChatMessages(prevMessages => [...prevMessages, newMessageReceived]);
+      }
+    });
+
+    return () => {
+      socket.off('message received');
+    };
+  }, [socket, selectedChat]);
 
   return (
     <div className="flex h-[52rem]">
@@ -346,28 +242,33 @@ const ChatLayout: React.FC = () => {
         </div>
       </div>
       <div className="flex-1 flex flex-col bg-white shadow-lg">
-        
         <div className="flex-1 p-4 overflow-y-auto">
           <div className="text-lg font-semibold">
-                Chat with {checkNotYour(selectedChat)}
+            Chat with {checkNotYour(selectedChat)}
           </div>
-          {chatMessage.map(message=>(
+          {chatMessages.map(message => (
             <div className="mt-4 space-y-2" key={message.id}>
-            <div>
-              <div className="text-sm text-gray-500">
-                {new Date(message.createdAt).toLocaleString()}
+              <div>
+                <div className="text-sm text-gray-500">
+                  {new Date(message.createdAt).toLocaleString()}
+                </div>
+                <div className="font-medium">{message.sender.name}</div>
+                <div>{message.content}</div>
               </div>
-              <div className="font-medium">{message.sender.name}</div>
-              <div>{message.content}</div>
             </div>
-          </div>
           ))}
         </div>
         <div className="p-4 bg-gray-100 border-t">
-          <Input fullWidth color="primary" size="md" placeholder="Chat here" />
+          <Input
+            fullWidth
+            color="primary"
+            size="md"
+            placeholder="Chat here"
+            value={newMessage}
+            onChange={e => setNewMessage(e.target.value)}
+            onKeyDown={sendMessage}
+          />
         </div>
-
-
       </div>
     </div>
   );

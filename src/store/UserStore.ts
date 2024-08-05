@@ -13,6 +13,7 @@ export type UserStore = {
   id: string;
   role: string;
   firstName: string;
+  lastName: string;
   isAuthenticated: boolean;
   setUser: (user: UserTypes) => void;
   setIsAuthenticated: (auth: boolean) => void;
@@ -31,6 +32,7 @@ export const UserStore = create(
       id: '',
       role: '',
       firstName: '',
+      lastName:'',
       isAuthenticated: false,
       setUser: (user: UserTypes) => {
         set({ id: user.id, role: user.role, firstName: user.firstName });

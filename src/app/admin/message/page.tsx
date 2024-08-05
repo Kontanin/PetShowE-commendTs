@@ -7,7 +7,7 @@ import { UserStore } from '@/store/UserStore';
 import io, { Socket } from 'socket.io-client';
 import axios from 'axios';
 import { endpoint } from '@/components/Chatbox/Chatbox';
-import chat from './chat.json'
+import chats from './chat.json'
 // import { toast } from 'react-toastify'; // Assuming you're using react-toastify for notifications
 interface User {
   id: string;
@@ -18,7 +18,7 @@ interface User {
 interface Message {
   id: number;
   content: string;
-  createdAt: string;
+  createdAt: Date;
   senderId: string;
   recipientId: string;
   isRead: boolean;
@@ -26,25 +26,29 @@ interface Message {
   recipient: User;
 }
 
-const chats: Message[] = [
-  // ข้อมูล mockup ของแชท
-];
+const parsedChats: Message[] = chats.map(chat => ({
+  ...chat,
+  createdAt: new Date(chat.createdAt), // Convert createdAt to Date
+}));
+
+console.log(parsedChats);
 
 const ChatLayout: React.FC = () => {
   const { id } = UserStore();
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedChat, setSelectedChat] = useState<Message>(chats[0]);
-
+  const [selectedChat, setSelectedChat] = useState<Message>(parsedChats[0]);
+  const [typing, setTyping] = useState(false);
   const [socketConnected, setSocketConnected] = useState<boolean>(false);
   const [newMessage, setNewMessage] = useState<string>('');
-  const chatMessages = useRef<Message[]>([selectedChat]);
+  const chatMessages = useRef<Message[]>(parsedChats);
+  // chatMessages ควรเป็นdata
   const socketRef = useRef<Socket | null>(null);
 
   const Chathandle = (chat: Message) => {
     setSelectedChat(chat);
   };
 
-  const filteredChats = chats.filter(chat =>
+  const filteredChats = parsedChats.filter(chat =>
     chat.sender.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
@@ -63,7 +67,30 @@ const ChatLayout: React.FC = () => {
     }
     return userName;
   };
-
+  const typingHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewMessage(e.target.value);
+  
+    if (!socketConnected) return;
+  
+    if (!typing) {
+      setTyping(true);
+      socketRef.current?.emit('typing', selectedChat.id);
+    }
+  
+    const lastTypingTime = new Date().getTime();
+    const timerLength = 3000;
+  
+    setTimeout(() => {
+      const timeNow = new Date().getTime();
+      const timeDiff = timeNow - lastTypingTime;
+  
+      if (timeDiff >= timerLength && typing) {
+        socketRef.current?.emit('stop typing', selectedChat.id);
+        setTyping(false);
+      }
+    }, timerLength);
+  };
+  
   const fetchMessages = async () => {
     if (!selectedChat) return;
 
@@ -124,7 +151,7 @@ const ChatLayout: React.FC = () => {
 
   useEffect(() => {
     fetchMessages();
-  }, [selectedChat]);
+  });
 
   useEffect(() => {
     if (!socketRef.current) return;
@@ -198,28 +225,59 @@ const ChatLayout: React.FC = () => {
           <div className="text-lg font-semibold">
             Chat with {checkNotYour(selectedChat)}
           </div>
-          {chatMessages.current.map(message => (
-            <div className="mt-4 space-y-2" key={message.id}>
-              <div>
-                <div className="text-sm text-gray-500">
-                  {new Date(message.createdAt).toLocaleString()}
-                </div>
-                <div className="font-medium">{message.sender.name}</div>
-                <div>{message.content}</div>
-              </div>
-            </div>
-          ))}
+          {chatMessages.current.map((message, index) => {
+  // Determine if the time difference between the current message and the previous one is more than 5 minutes
+  const showTimestamp = index === 0 || (
+    message.createdAt instanceof Date &&
+    chatMessages.current[index - 1].createdAt instanceof Date &&
+    message.createdAt.getTime() - chatMessages.current[index - 1].createdAt.getTime() > 300000
+  );
+  
+  return (
+    <div key={message.id} className="flex flex-col items-center mb-2">
+      {showTimestamp && (
+        <span className="text-xs text-gray-500">
+          {new Date(message.createdAt).toLocaleTimeString()}
+        </span>
+      )}
+      <div
+        className={`flex w-full ${message.senderId == id ? 'justify-end' : 'justify-start'}`}
+      >
+        <div
+          className={`max-w-xs p-3 rounded-lg shadow-md ${
+            message.senderId == id ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'
+          }`}
+        >
+          <p>{message.content}</p>
+        </div>
+      </div>
+    </div>
+  );
+})
+
+}
         </div>
         <div className="p-4 bg-gray-100 border-t">
+        <Input
+  fullWidth
+  color="primary"
+  size="md"
+  placeholder="Chat here"
+  value={newMessage}
+  onChange={typingHandler} // Updated to use typingHandler
+  onKeyDown={sendMessage}
+/>
+
           <Input
-            fullWidth
-            color="primary"
-            size="md"
-            placeholder="Chat here"
-            value={newMessage}
-            onChange={e => setNewMessage(e.target.value)}
-            onKeyDown={sendMessage}
-          />
+  fullWidth
+  color="primary"
+  size="md"
+  placeholder="Chat here"
+  value={newMessage}
+  onChange={typingHandler} // Updated to use typingHandler
+  onKeyDown={sendMessage}
+/>
+
         </div>
       </div>
     </div>

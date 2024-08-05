@@ -27,35 +27,25 @@ type SliderCpProps = {
 const SliderCp: React.FC<SliderCpProps> = ({ api }) => {
   return (
     <Swiper
-      spaceBetween={30}
-      slidesPerView={3}
+      spaceBetween={10} // Reduced space between slides for partial visibility
+      slidesPerView={6}
+      centeredSlides={false} // Center the active slide
       navigation={true}
       pagination={{ clickable: true }}
       modules={[Pagination, Navigation]}
-      className="w-full mx-auto"
-      breakpoints={{
-        1024: {
-          slidesPerView: 3,
-        },
-        768: {
-          slidesPerView: 2,
-        },
-        480: {
-          slidesPerView: 1,
-        },
-      }}
+      loop={true}
     >
-      {api.map((product) => (
+      {api.map(product => (
         <SwiperSlide key={product.id}>
-          <div className="grid justify-items-center m-10 p-5">
+          <div className="pb-10 grid justify-center">
             <Image
               src={product.image}
-              width={500}
-              height={500}
               alt={product.productName}
-              className="w-full h-64 object-cover"
+              width={200}
+              height={200}
             />
-            <h1 className="my-4 text-lg font-semibold">{product.productName}</h1>
+            <h3>{product.productName}</h3>
+            <p className="text-red-500"> ${product.unitPrice}</p>
           </div>
         </SwiperSlide>
       ))}

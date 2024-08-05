@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import { Input, Avatar } from '@nextui-org/react';
-import {Breadcrumbs, BreadcrumbItem} from "@nextui-org/react";
+import { Breadcrumbs, BreadcrumbItem } from '@nextui-org/react';
 import Link from 'next/link';
 interface User {
   id: string;
@@ -22,65 +22,62 @@ interface Message {
 
 const ChatLayout: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
-  // const Johnhistory:Message[]=
-
-  // [
-  //   {
-  //     id: 1,
-  //     content: "Hey, how's it going?",
-  //     createdAt: '2024-08-01T12:34:56Z',
-  //     senderId: '1',
-  //     recipientId: '2',
-  //     isRead: false,
-  //     sender: {
-  //       id: '1',
-  //       name: 'John Doe',
-  //       email: 'john.doe@example.com',
-  //     },
-  //     recipient: {
-  //       id: '2',
-  //       name: 'Jane Smith',
-  //       email: 'jane.smith@example.com',
-  //     },
-  //   },
-  //   {
-  //     id: 2,
-  //     content: "I'm good, thanks for asking!",
-  //     createdAt: '2024-08-01T12:35:30Z',
-  //     senderId: '2',
-  //     recipientId: '1',
-  //     isRead: true,
-  //     sender: {
-  //       id: '2',
-  //       name: 'Jane Smith',
-  //       email: 'jane.smith@example.com',
-  //     },
-  //     recipient: {
-  //       id: '1',
-  //       name: 'John Doe',
-  //       email: 'john.doe@example.com',
-  //     },
-  //   },
-  //   {
-  //     id: 3,
-  //     content: 'Are you free for a call later?',
-  //     createdAt: '2024-08-01T13:00:00Z',
-  //     senderId: '1',
-  //     recipientId: '2',
-  //     isRead: false,
-  //     sender: {
-  //       id: '1',
-  //       name: 'John Doe',
-  //       email: 'john.doe@example.com',
-  //     },
-  //     recipient: {
-  //       id: '5',
-  //       name: 'Jane Smith',
-  //       email: 'jane.smith@example.com',
-  //     },
-  //   },
-  // ];
-
+  const Johnhistory: Message[] = [
+    {
+      id: 1,
+      content: "Hey, how's it going?",
+      createdAt: '2024-08-01T12:34:56Z',
+      senderId: '1',
+      recipientId: '2',
+      isRead: false,
+      sender: {
+        id: '1',
+        name: 'John Doe',
+        email: 'john.doe@example.com',
+      },
+      recipient: {
+        id: '2',
+        name: 'Jane Smith',
+        email: 'jane.smith@example.com',
+      },
+    },
+    {
+      id: 2,
+      content: "I'm good, thanks for asking!",
+      createdAt: '2024-08-01T12:35:30Z',
+      senderId: '2',
+      recipientId: '1',
+      isRead: true,
+      sender: {
+        id: '2',
+        name: 'Jane Smith',
+        email: 'jane.smith@example.com',
+      },
+      recipient: {
+        id: '1',
+        name: 'John Doe',
+        email: 'john.doe@example.com',
+      },
+    },
+    {
+      id: 3,
+      content: 'Are you free for a call later?',
+      createdAt: '2024-08-01T13:00:00Z',
+      senderId: '1',
+      recipientId: '2',
+      isRead: false,
+      sender: {
+        id: '1',
+        name: 'John Doe',
+        email: 'john.doe@example.com',
+      },
+      recipient: {
+        id: '5',
+        name: 'Jane Smith',
+        email: 'jane.smith@example.com',
+      },
+    },
+  ];
 
   const chats: Message[] = [
     {
@@ -150,17 +147,18 @@ const ChatLayout: React.FC = () => {
 
   return (
     <div className="flex h-[52rem]">
-
-
       <div className="w-1/4 bg-white shadow-lg p-4">
-      {/* <div className="p-1">
-      <Breadcrumbs>
-      <BreadcrumbItem>
-      <Link href="/admin">admin</Link>
-      </BreadcrumbItem>
-      <BreadcrumbItem>     <Link href="/admin/orders">orders</Link></BreadcrumbItem>
-    </Breadcrumbs>
-      </div>
+        <div className="p-1">
+          <Breadcrumbs>
+            <BreadcrumbItem>
+              <Link href="/admin">admin</Link>
+            </BreadcrumbItem>
+            <BreadcrumbItem>
+              {' '}
+              <Link href="/admin/orders">orders</Link>
+            </BreadcrumbItem>
+          </Breadcrumbs>
+        </div>
         <Input
           fullWidth
           color="primary"
@@ -169,7 +167,7 @@ const ChatLayout: React.FC = () => {
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
         />
-        
+
         <div className="mt-6">
           <div className="text-lg font-semibold">My Chats</div>
           <div className="mt-2 space-y-2">
@@ -218,7 +216,7 @@ const ChatLayout: React.FC = () => {
         </div>
         <div className="p-4 bg-gray-100 border-t">
           <Input fullWidth color="primary" size="md" placeholder="Chat here" />
-        </div> */}45
+        </div>
       </div>
     </div>
   );

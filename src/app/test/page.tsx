@@ -1,8 +1,6 @@
-"use client"
+'use client';
 import { useEffect, useState } from 'react';
 import io, { Socket } from 'socket.io-client';
-
-
 
 // Define the socket type with the data you expect to handle
 interface AuthenticatedSocket extends Socket {
@@ -39,30 +37,27 @@ interface User {
 }
 
 const SOCKET_URL = 'http://localhost:5000'; // Replace with your server URL
-
-const SingleChat: React.FC<{ selectedChat: any; user: User }> = ({ selectedChat, user }) => {
+var socket, selectedChatCompare;
+const SingleChat: React.FC<{ selectedChat: any }> = ({ selectedChat }) => {
   const [socket, setSocket] = useState<AuthenticatedSocket | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [socketConnected, setSocketConnected] = useState(false);
   const [newMessage, setNewMessage] = useState<string>('');
   const [typing, setTyping] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<boolean>(false);
-
+  let user = '1';
   useEffect(() => {
-    const socketConnection: AuthenticatedSocket = io(SOCKET_URL) as AuthenticatedSocket;
-    console.log("try")
-    setSocket(socketConnection);
-
-    socketConnection.on('connected', () => {
-      console.log('Connected to the server');
-      socketConnection.emit('setup', user);
-    });
+    const socketConnection: AuthenticatedSocket = io(
+      SOCKET_URL,
+    ) as AuthenticatedSocket;
+    socketConnection.emit('setup', user);
+    socketConnection.on('connected', () => {setSocketConnected(true)});
 
     socketConnection.on('message recieved', (newMessageRecieved: Message) => {
       if (!selectedChat || selectedChat._id !== newMessageRecieved.chat._id) {
         // Show notification if the message is from another chat
-
       } else {
-        setMessages((prevMessages) => [...prevMessages, newMessageRecieved]);
+        setMessages(prevMessages => [...prevMessages, newMessageRecieved]);
       }
     });
 
@@ -119,7 +114,7 @@ const SingleChat: React.FC<{ selectedChat: any; user: User }> = ({ selectedChat,
   return (
     <div>
       <div>
-        {messages.map((msg) => (
+        {messages.map(msg => (
           <div key={msg._id}>
             <span>{msg.sender.name}</span>: {msg.content}
           </div>

@@ -7,7 +7,7 @@ import { UserStore } from '@/store/UserStore';
 import io, { Socket } from 'socket.io-client';
 import axios from 'axios';
 import { endpoint } from '@/components/Chatbox/Chatbox';
-import chats from './chat.json'
+import chats from '@/data/chat.json'
 // import { toast } from 'react-toastify'; // Assuming you're using react-toastify for notifications
 interface User {
   id: string;

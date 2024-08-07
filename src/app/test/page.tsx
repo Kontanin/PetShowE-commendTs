@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import io, { Socket } from 'socket.io-client';
 
 // Define the socket type with the data you expect to handle
@@ -37,37 +37,55 @@ interface User {
 }
 
 const SOCKET_URL = 'http://localhost:5000'; // Replace with your server URL
-var socket, selectedChatCompare;
+
+let socket: AuthenticatedSocket | null = null; // Declare socket at the top
+let selectedChatCompare: any; // Declare selectedChatCompare at the top
+
 const SingleChat: React.FC<{ selectedChat: any }> = ({ selectedChat }) => {
-  const [socket, setSocket] = useState<AuthenticatedSocket | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [socketConnected, setSocketConnected] = useState(false);
   const [newMessage, setNewMessage] = useState<string>('');
   const [typing, setTyping] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<boolean>(false);
+  const lastTypingTimeRef = useRef<number>(0); // To track the last typing time
   let user = '1';
+
   useEffect(() => {
-    const socketConnection: AuthenticatedSocket = io(
-      SOCKET_URL,
-    ) as AuthenticatedSocket;
-    socketConnection.emit('setup', user);
-    socketConnection.on('connected', () => {setSocketConnected(true)});
+    socket = io(SOCKET_URL) as AuthenticatedSocket;
 
-    socketConnection.on('message recieved', (newMessageRecieved: Message) => {
-      if (!selectedChat || selectedChat._id !== newMessageRecieved.chat._id) {
-        // Show notification if the message is from another chat
-      } else {
-        setMessages(prevMessages => [...prevMessages, newMessageRecieved]);
-      }
-    });
+    socket.emit('setup', user);
+    socket.on('connected', () => {
+      console.log("connec")
+      setSocketConnected(true)});
 
-    socketConnection.on('typing', () => setIsTyping(true));
-    socketConnection.on('stop typing', () => setIsTyping(false));
+    // socket.on('message recieved', (newMessageRecieved: Message) => {
+    //   if (!selectedChatCompare || selectedChatCompare._id !== newMessageRecieved.chat._id) {
+    //     // Show notification if the message is from another chat
+    //   } else {
+    //     setMessages(prevMessages => [...prevMessages, newMessageRecieved]);
+    //   }
+    // });
+
+    socket.on('typing', () => {console.log('isTyping');
+      setIsTyping(true)});
+    socket.on('stop typing', () => setIsTyping(false));
 
     return () => {
-      socketConnection.disconnect();
+      socket?.disconnect();
     };
-  }, [selectedChat, user]);
+  }, [user]);
+
+  useEffect(() => {
+    console.log("re")
+    socket?.on("message recieved", (newMessageRecieved) => {
+      console.log("message recieved")
+    });
+  });
+
+
+  useEffect(() => {
+    selectedChatCompare = selectedChat;
+  }, []);
 
   const sendMessage = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && newMessage.trim()) {
@@ -92,25 +110,30 @@ const SingleChat: React.FC<{ selectedChat: any }> = ({ selectedChat }) => {
   const typingHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewMessage(e.target.value);
 
-    if (!socket || !selectedChat) return;
+    if (!socketConnected ) return;
 
     if (!typing) {
       setTyping(true);
-      socket.emit('typing', selectedChat._id);
+      console.log("Typing")
+      socket?.emit('typing', "1");
     }
-
-    const lastTypingTime = new Date().getTime();
     const timerLength = 3000;
-    setTimeout(() => {
-      const timeNow = new Date().getTime();
-      const timeDiff = timeNow - lastTypingTime;
+    lastTypingTimeRef.current = new Date().getTime();
 
-      if (timeDiff >= timerLength && typing) {
-        socket.emit('stop typing', selectedChat._id);
-        setTyping(false);
-      }
-    }, timerLength);
+    // setTimeout(() => {
+    //   const timeNow = new Date().getTime();
+    //   const timeDiff = timeNow - lastTypingTimeRef.current;
+
+    //   if (timeDiff >= timerLength && typing) {
+    //     socket?.emit('stop typing',"1");
+    //     setTyping(false);
+    //   }
+    // }, timerLe
+    socket?.emit('stop typing',"1");
+    console.log("strp")
+
   };
+
   return (
     <div>
       <div>

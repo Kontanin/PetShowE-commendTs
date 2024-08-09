@@ -49,13 +49,13 @@ const SingleChat: React.FC<{ selectedChat: any }> = ({ selectedChat }) => {
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const lastTypingTimeRef = useRef<number>(0); // To track the last typing time
   let user = '1';
-
+  socket = io(SOCKET_URL) as AuthenticatedSocket;
   useEffect(() => {
-    socket = io(SOCKET_URL) as AuthenticatedSocket;
+    
 
-    socket.emit('setup', user);
-    socket.on('connected', () => {
-      console.log("connec")
+    socket?.emit('setup', user);
+    socket?.on('connected', (data) => {
+      console.log("connec",data)
       setSocketConnected(true)});
 
     // socket.on('message recieved', (newMessageRecieved: Message) => {
@@ -66,23 +66,17 @@ const SingleChat: React.FC<{ selectedChat: any }> = ({ selectedChat }) => {
     //   }
     // });
 
-    socket.on('typing', () => {console.log('isTyping');
-      setIsTyping(true)});
-    socket.on('stop typing', () => setIsTyping(false));
 
-    return () => {
-      socket?.disconnect();
-    };
+    socket?.on('stop typing', () => setIsTyping(false));
+
+  
+
   }, [user]);
-
-  useEffect(() => {
-    console.log("re")
-    socket?.on("message recieved", (newMessageRecieved) => {
-      console.log("message recieved")
-    });
+  socket.on('typing', () => {console.log('isTyping');
+    setIsTyping(true)});
+  socket.on('message recieved', (newMessageRecieved) => {
+    console.log("message recieved")
   });
-
-
   useEffect(() => {
     selectedChatCompare = selectedChat;
   }, []);

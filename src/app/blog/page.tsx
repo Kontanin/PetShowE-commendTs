@@ -2,7 +2,7 @@
 import React from 'react';
 import { Tabs, Tab, Card, CardBody, Image } from '@nextui-org/react';
 import Link from 'next/link';
-import tabData from '@/data/Blog.json';
+import tabData from '@/data/blog.json';
 
 const tabList = ['Dogs', 'Cats', 'Birds', 'Water Animals', 'Exotic'];
 

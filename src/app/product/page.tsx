@@ -1,7 +1,6 @@
-// pages/index.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import FilterSidebar from '@/components/Productslice/FilterSidebar';
 import ProductGrid from '@/components/Productslice/ProductGrid';
@@ -9,14 +8,12 @@ import products from '@/data/products.json';
 import promotionsJson from '@/data/promotions.json';
 import { Promotion, PromotionType } from '@/types/promotionTypes';
 
-
-
 const promotions: Promotion[] = promotionsJson.map(promo => ({
   ...promo,
   type: promo.type as PromotionType
 }));
 
-const Home: React.FC = () => {
+const MiniHome: React.FC = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get('category');
@@ -50,30 +47,42 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div>
-      <div className="flex">
-        <div className="w-1/4">
-          <FilterSidebar
-            filters={filters}
-            priceRange={priceRange}
-            onFilterChange={handleFilterChange}
-            onPriceChange={setPriceRange}
-            search={search}
-            onSearchChange={handleSearchChange}
-          />
+
+
+        <div className="flex">
+          <div className="w-1/4">
+            <FilterSidebar
+              filters={filters}
+              priceRange={priceRange}
+              onFilterChange={handleFilterChange}
+              onPriceChange={setPriceRange}
+              search={search}
+              onSearchChange={handleSearchChange}
+            />
+          </div>
+          <div className="w-3/4 p-4">
+            <ProductGrid
+              filters={filters}
+              priceRange={priceRange}
+              products={products}
+              search={search}
+              checkPromotions={checkPromotions}
+            />
+          </div>
         </div>
-        <div className="w-3/4 p-4">
-          <ProductGrid
-            filters={filters}
-            priceRange={priceRange}
-            products={products}
-            search={search}
-            checkPromotions={checkPromotions}
-          />
-        </div>
-      </div>
-    </div>
+  
+  
   );
 };
 
+
+
+const Home: React.FC = () => {
+  return (
+    // You could have a loading skeleton as the `fallback` too
+    <Suspense>
+     <MiniHome/>
+    </Suspense>
+  )
+}
 export default Home;

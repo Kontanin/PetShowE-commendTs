@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { UserStore } from '@/store/UserStore';
 import io, { Socket } from 'socket.io-client';
 import axios from 'axios';
-import { endpoint } from '@/components/Chatbox/Chatbox';
+
 import chats from '@/data/chat.json'
 // import { toast } from 'react-toastify'; // Assuming you're using react-toastify for notifications
 interface User {
@@ -31,8 +31,7 @@ const parsedChats: Message[] = chats.map(chat => ({
   createdAt: new Date(chat.createdAt), // Convert createdAt to Date
 }));
 
-console.log(parsedChats);
-
+const endpoint = 'http://localhost:5000';
 const ChatLayout: React.FC = () => {
   const { id } = UserStore();
   const [searchQuery, setSearchQuery] = useState<string>('');

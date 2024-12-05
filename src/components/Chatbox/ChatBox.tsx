@@ -5,6 +5,7 @@ import io, { Socket } from 'socket.io-client';
 import classNames from 'classnames';
 import { UserStore } from '@/store/UserStore';
 import Cookies from 'js-cookie';
+import { user } from '@nextui-org/react';
 
 export const endpoint = 'http://localhost:5000';
 
@@ -29,94 +30,95 @@ interface Message {
   createdAt: string;
 }
 
-const ChatBox: React.FC = () => {
-  const { id: currentUserID } = UserStore(); // Get the user ID from UserStore
+interface ChatBoxProps {
+  newMessageCount: number;
+}
+
+const ChatBox: React.FC<ChatBoxProps> = ({ newMessageCount }) => {
+  const token = Cookies.get('authToken') || 'default_token';
+  const socketInstance = initializeSocket(token);
+
+  const { id: currentUserID, firstName } = UserStore(); // Get the user ID from UserStore
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  const [offset, setOffset] = useState(0);
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [newMessageCount, setNewMessageCount] = useState(0);
 
-  const disconnectSocket = () => {
-    if (socket) {
-      // ยกเลิกการสมัครรับฟังเหตุการณ์ก่อน
-      socket.off('connect_error');
-      socket.off('error');
-      socket.off('previousMessages');
-      socket.off('new-message');
-      socket.disconnect();
-      console.log('Socket disconnected');
-    }
-  };
+  socketInstance.on('new-message', (msg: Message) => {
+    console.log('New message:', msg);
+    setMessages(prevMessages => [msg, ...(prevMessages || [])]);
+  });
+  let room = 12;
 
   useEffect(() => {
-    const token = Cookies.get('authToken') || 'default_token'; // Use a default value or handle token retrieval more robustly
-    const socketInstance = initializeSocket(token);
+    if (socketInstance) {
+      socketInstance.emit('joinRoom', room);
+      console.log(`Joined room: ${room}`);
+    }
+  }, [room]);
 
-    // Error handling
-    socketInstance.on('connect_error', error => {
-      console.error('Connection error:', error);
-    });
-
-    // Handle new chat messages
-    socketInstance.on('new-message', (msg: Message) => {
-      setMessages(prevMessages => [msg, ...prevMessages]);
-      if (!isOpen) {
-        setNewMessageCount(prevCount => prevCount + 1);
-      }
-    });
-
-    // Mock the notification count initialization
-    setNewMessageCount(2);
-
-    setSocket(socketInstance);
-
-    window.addEventListener('beforeunload', disconnectSocket);
-
-    return () => {
-      window.removeEventListener('beforeunload', disconnectSocket);
-      disconnectSocket();
-    };
-  }, [isOpen]);
+  const fetchMessages = async () => {
+    try {
+      let AdminUserId= await fetch
+      // const res = await fetch('/api/messages');
+      // const data = await res.json();
+      // setMessages(data);
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+    }
+  };
 
   const toggleChat = () => {
     setIsOpen(!isOpen);
     if (!isOpen) {
-      setNewMessageCount(0);
+      fetchMessages();
     }
   };
 
-  const handleSendMessage = () => {
-    if (input.trim() && socket) {
+  const handleSendMessage = async () => {
+    if (socketInstance) {
       const newMessage: Message = {
-        userId: currentUserID, // Use the user ID from UserStore
-        content: input,
+        userId: currentUserID,
+        content: input.trim(),
         user: null,
         createdAt: new Date().toISOString(),
       };
-      socket.emit('sent-message', newMessage, (error?: string) => {
-        if (error) {
-          console.error('Send message error:', error);
-        }
-      });
-      setInput('');
-    }
-  };
 
-  const loadMoreMessages = () => {
-    const newOffset = offset + 100;
-    setOffset(newOffset);
-    if (socket) {
-      socket.emit(
-        'load-more-messages',
-        { offset: newOffset },
-        (error?: string) => {
-          if (error) {
-            console.error('Load more messages error:', error);
-          }
-        },
-      );
+      try {
+
+        const resId = await fetch('/user/user-id', {
+          method: 'Get',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newMessage),
+        });
+        const res = await fetch('/api/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newMessage),
+        });
+
+        if (!res.ok) {
+          throw new Error('Failed to send message');
+        }
+        if (!resId.ok) {
+          throw new Error('not found this user');
+        }
+        if (room && newMessage) {
+          socketInstance.emit('sendMessageToRoom', {
+            roomName: room,
+            message: newMessage,
+          });
+          setMessages([newMessage]); 
+        }
+        setInput('');
+        setMessages(prevMessages => [newMessage, ...(prevMessages || [])]);
+      } catch (error) {
+        console.error('Error sending message:', error);
+      }
     }
   };
 
@@ -135,9 +137,6 @@ const ChatBox: React.FC = () => {
               </button>
             </div>
             <div className="flex-1 overflow-y-auto">
-              <button onClick={loadMoreMessages} className="text-blue-500">
-                Load More Messages
-              </button>
               <div className="text-gray-600 text-sm flex flex-col space-y-2">
                 {messages.map((message, index) => (
                   <div

@@ -39,7 +39,6 @@ export default function ProductPage({ params: { id } }: ProductPageProps) {
   const handleAddtoCart = () => {
     const { stock, ...rest } = newp;
     const cartItem = { ...rest, quantity: selectedQuantity };
-    console.log("add")
     addToCart(cartItem);
     newp.stock = stock - selectedQuantity;
     updatestock(stock - selectedQuantity);

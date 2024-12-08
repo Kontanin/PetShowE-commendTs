@@ -1,19 +1,23 @@
 import { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-export async function GET(req:NextRequest) {
-  
+export async function GET() {
+  return NextResponse.json({ test: 'test' });
+}
+export async function POST(req: NextRequest) {
   const body = await req.json();
   const res = await fetch(
-    'http://localhost:5000/chat',
+    'http://localhost:5000/user/user-id',
+
     {
-      method: 'GET',
+      method: 'POST',
       body: JSON.stringify(body),
       headers: {
         'Content-Type': 'application/json',
       },
     },
   );
-  return NextResponse.json(res);
-}
 
+  const data = await res.json();
+  return NextResponse.json(data);
+}

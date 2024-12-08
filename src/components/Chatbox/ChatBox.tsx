@@ -6,6 +6,9 @@ import classNames from 'classnames';
 import { UserStore } from '@/store/UserStore';
 import Cookies from 'js-cookie';
 import { user } from '@nextui-org/react';
+import doGetRequest from '@/utils/doGetRequest';
+import doPostRequest from '@/utils/doPostRequest';
+import ErrorIcon from '@mui/icons-material/Error';
 
 export const endpoint = 'http://localhost:5000';
 
@@ -24,10 +27,14 @@ interface User {
 }
 
 interface Message {
-  userId: string;
+  id: number | null;
+  senderId: string;
+  recipientId: string;
   content: string;
   user: User | null;
   createdAt: string;
+  isRead: boolean;
+  status: null | boolean;
 }
 
 interface ChatBoxProps {
@@ -58,15 +65,21 @@ const ChatBox: React.FC<ChatBoxProps> = ({ newMessageCount }) => {
   }, [room]);
 
   const fetchMessages = async () => {
+    console.log('fetch');
     try {
-      let AdminUserId= await fetch
-      // const res = await fetch('/api/messages');
-      // const data = await res.json();
-      // setMessages(data);
+      const res = await doGetRequest(`/api/fetch-messages/${currentUserID}`);
+      console.log(res, 'res');
+      if (res.length > 0) {
+        setMessages(res);
+      }
     } catch (error) {
       console.error('Error fetching messages:', error);
     }
   };
+
+
+
+  
 
   const toggleChat = () => {
     setIsOpen(!isOpen);
@@ -76,49 +89,39 @@ const ChatBox: React.FC<ChatBoxProps> = ({ newMessageCount }) => {
   };
 
   const handleSendMessage = async () => {
-    if (socketInstance) {
-      const newMessage: Message = {
-        userId: currentUserID,
-        content: input.trim(),
-        user: null,
-        createdAt: new Date().toISOString(),
-      };
-
-      try {
-
-        const resId = await fetch('/user/user-id', {
-          method: 'Get',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(newMessage),
-        });
-        const res = await fetch('/api/messages', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(newMessage),
-        });
-
-        if (!res.ok) {
-          throw new Error('Failed to send message');
-        }
-        if (!resId.ok) {
-          throw new Error('not found this user');
-        }
-        if (room && newMessage) {
-          socketInstance.emit('sendMessageToRoom', {
-            roomName: room,
-            message: newMessage,
-          });
-          setMessages([newMessage]); 
-        }
-        setInput('');
-        setMessages(prevMessages => [newMessage, ...(prevMessages || [])]);
-      } catch (error) {
-        console.error('Error sending message:', error);
+    const newMessage: Message = {
+      id: null,
+      senderId: currentUserID,
+      recipientId: 'g',
+      content: input.trim(),
+      user: null,
+      createdAt: new Date().toISOString(),
+      isRead: false,
+      status: null,
+    };
+    console.log(newMessage);
+    try {
+      let res = await doPostRequest(newMessage, '/api/create-messages-admin');
+      console.log(res, 'res');
+      if (res == false) {
+        throw new Error('Failed to send message');
+        console.log('create message false');
+        newMessage.status = true;
       }
+
+      if (room && newMessage) {
+        socketInstance.emit('sendMessageToRoom', {
+          roomName: room,
+          message: newMessage,
+        });
+      }
+
+      setInput('');
+      fetchMessages();
+    } catch (error) {
+      setMessages(prevMessages => [...prevMessages, newMessage]);
+      console.error('Error sending message:', error);
+      setInput('');
     }
   };
 
@@ -138,12 +141,12 @@ const ChatBox: React.FC<ChatBoxProps> = ({ newMessageCount }) => {
             </div>
             <div className="flex-1 overflow-y-auto">
               <div className="text-gray-600 text-sm flex flex-col space-y-2">
-                {messages.map((message, index) => (
+                {messages.reverse().map((message, index) => (
                   <div
                     key={index}
                     className={classNames(
                       'p-2 rounded-lg max-w-xs break-words',
-                      message.userId === currentUserID
+                      message.senderId === currentUserID
                         ? 'bg-blue-500 text-white self-end text-right'
                         : 'bg-gray-200 text-black self-start text-left',
                     )}

@@ -30,7 +30,7 @@ function Login() {
 
     try {
       let result = await doPostRequest(data, '/api/login');
-
+      console.log(result)
       if (result.accessToken) {
         Cookies.set('authToken', result.accessToken, { expires: 7 });
         setUser(result);

@@ -169,7 +169,95 @@ const ChatLayout: React.FC = () => {
 
   return (
     <div className="flex h-[52rem]">
-      <div className="p-4 bg-gray-100 border-t">qwer</div>
+      <div className="w-1/4 bg-white shadow-lg p-4">
+        <div className="p-1">
+          <Breadcrumbs>
+            <BreadcrumbItem>
+              <Link href="/admin">admin</Link>
+            </BreadcrumbItem>
+            <BreadcrumbItem>
+              <Link href="/admin/orders">orders</Link>
+            </BreadcrumbItem>
+          </Breadcrumbs>
+        </div>
+        <div className="mt-6">
+          <div className="text-lg font-semibold">My Chats</div>
+          <div className="mt-2 space-y-2">
+            {parsedChats.map(chatid => (
+              <div
+                key={chatid.id}
+                className={`p-2 border-b-2 cursor-pointer hover:bg-gray-200 ${
+                  selectedChat?.id === chatid.id ? 'bg-gray-100' : ''
+                }`}
+                onClick={() => Chathandle(chatid)}
+              >
+                <div className="flex items-center">
+                  <Avatar />
+                  <div className="ml-2">
+                    <div className="font-medium">{chatid.sender.name}</div>
+                    <div className="text-sm text-gray-500">
+                      {chatid.content.length > 20
+                        ? `${chatid.content.substring(0, 20)}...`
+                        : chatid.content}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="flex-1 flex flex-col bg-white shadow-lg">
+        <div className="flex-1 p-4 overflow-y-auto">
+          <div className="text-lg font-semibold">
+            Chat with {checkNotYour(selectedChat)}
+          </div>
+          {chatMessages.current.map((message, index) => {
+            // Determine if the time difference between the current message and the previous one is more than 5 minutes
+            const showTimestamp =
+              index === 0 ||
+              (message.createdAt instanceof Date &&
+                chatMessages.current[index - 1].createdAt instanceof Date &&
+                message.createdAt.getTime() -
+                  chatMessages.current[index - 1].createdAt.getTime() >
+                  300000);
+
+            return (
+              <div key={message.id} className="flex flex-col items-center mb-2">
+                {showTimestamp && (
+                  <span className="text-xs text-gray-500">
+                    {new Date(message.createdAt).toLocaleTimeString()}
+                  </span>
+                )}
+                <div
+                  className={`flex w-full ${message.senderId == id ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div
+                    className={`max-w-xs p-3 rounded-lg shadow-md ${
+                      message.senderId == id
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-200 text-black'
+                    }`}
+                  >
+                    <p>{message.content}</p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="p-4 bg-gray-100 border-t">
+          <Input
+            fullWidth
+            color="primary"
+            size="md"
+            placeholder="Chat here"
+            value={newMessage}
+            onChange={typingHandler} // Updated to use typingHandler
+            onKeyDown={sendMessage}
+          />
+        </div>
+      </div>
     </div>
   );
 };

@@ -1,0 +1,39 @@
+[
+  {
+    "id": 1,
+    "content": "Hey, how's it going?",
+    "createdAt": "2024-08-01T12:34:56Z",
+    "senderId": "1",
+    "recipientId": "2",
+    "isRead": false,
+    "sender": {
+      "id": "1",
+      "name": "John Doe",
+      "email": "john.doe@example.com"
+    },
+    "recipient": {
+      "id": "2",
+      "name": "Jane Smith",
+      "email": "jane.smith@example.com"
+    }
+  },
+  {
+    "id": 2,
+    "content": "I'm good, thanks for asking!",
+    "createdAt": "2024-08-01T12:35:30Z",
+    "senderId": "2",
+    "recipientId": "1",
+    "isRead": true,
+    "sender": {
+      "id": "2",
+      "name": "Jane Smith",
+      "email": "jane.smith@example.com"
+    },
+    "recipient": {
+      "id": "1",
+      "name": "John Doe",
+      "email": "john.doe@example.com"
+    }
+  }
+
+]

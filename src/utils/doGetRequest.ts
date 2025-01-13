@@ -12,6 +12,7 @@ async function doGetRequest(path: string) {
 
   try {
     const res = await axios.get(path, { headers });  // Pass headers object correctly
+    
     return res.data;
   } catch (e) {
     console.error(e, 'error');

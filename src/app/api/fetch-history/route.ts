@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-
-export async function GET(
-  req: NextRequest,
-) {
+export async function GET(req: NextRequest) {
   // Extract the dynamic "id" from the context.params
 
   const authorizationHeader = req.headers.get('authorization') || 'test';
@@ -11,13 +8,16 @@ export async function GET(
 
   try {
     // Make the GET request to the backend with the dynamic ID
-    const res = await fetch(`http://localhost:5000/chat/chat-box/admin`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        authorization: authorizationHeader,
+    const res = await fetch(
+      `http://localhost:5000/chat/chat-box/adminHistory`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          authorization: authorizationHeader,
+        },
       },
-    });
+    );
 
     // Handle non-200 responses
     if (!res.ok) {

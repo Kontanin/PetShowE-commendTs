@@ -1,19 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-
 export async function GET(
   req: NextRequest,
   context: { params: { id: string } },
 ) {
   // Extract the dynamic "id" from the context.params
   const { id } = context.params;
+  console.log(id, 'id');
 
   if (!id) {
     return NextResponse.json({ error: 'ID is required' }, { status: 400 });
   }
   const authorizationHeader = req.headers.get('authorization') || 'test';
   // Example token (replace with your actual token logic)
-
   try {
     // Make the GET request to the backend with the dynamic ID
     const res = await fetch(`http://localhost:5000/chat/${id}`, {
@@ -23,7 +22,6 @@ export async function GET(
         authorization: authorizationHeader,
       },
     });
-
     // Handle non-200 responses
     if (!res.ok) {
       return NextResponse.json(

@@ -3,12 +3,12 @@ import React from 'react';
 import Link from 'next/link';
 
 export default function Item({
-  Links
+  Links,
 }: {
   Links: Array<{ name: string; path: string }>;
   title: string;
 }) {
-  const o = Links.map(item => (
+  const Map = Links.map(item => (
     <div className="mb-1" key={item.name}>
       <Link
         href={item.path}
@@ -19,7 +19,5 @@ export default function Item({
     </div>
   ));
 
-  return (
-   o
-  );
+  return Map;
 }

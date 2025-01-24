@@ -7,8 +7,7 @@ import { UserStore } from '@/store/UserStore';
 import io, { Socket } from 'socket.io-client';
 import axios from 'axios';
 import doGetRequest from '@/utils/doGetRequest';
-import chats from '@/data/chat.json';
-import chats1 from '@/data/chat1.json';
+import doPostRequest from '@/utils/doPostRequest';
 // import { toast } from 'react-toastify'; // Assuming you're using react-toastify for notifications
 interface User {
   id: string;
@@ -17,43 +16,43 @@ interface User {
 }
 
 interface Message {
-  id: number;
+  id: number | null;
+  senderId: string;
   content: string;
   createdAt: Date;
-  senderId: string;
-  recipientId: string;
   isRead: boolean;
-  sender: User;
-  recipient: User;
+  Conversation: {
+    UserId: string | null;
+  };
+  User: {
+    firstname: string | null;
+    lastname: string | null;
+  };
+  customerId: string | null;
 }
 
-const parsedChats: Message[] = chats.map(chat => ({
-  ...chat,
-  createdAt: new Date(chat.createdAt), // Convert createdAt to Date
-}));
-const parsedChats1: Message[] = chats1.map(chat => ({
-  ...chat,
-  createdAt: new Date(chat.createdAt), // Convert createdAt to Date
-}));
-const endpoint = 'http://localhost:5000';
 const ChatLayout: React.FC = () => {
   const { id } = UserStore();
   const [input, setInput] = useState('');
-  const [selectedChat, setSelectedChat] = useState<Message>(parsedChats[0]);
+  const { id: currentUserID, firstName } = UserStore(); // Get the user ID from UserStore
   const [typing, setTyping] = useState(false);
   const [socketConnected, setSocketConnected] = useState<boolean>(false);
-  const [newMessage, setNewMessage] = useState<string>('');
-  const chatMessages = useRef<Message[]>(parsedChats);
-  const [ChatHistory, setChatHistory] = useState<Message[]>(parsedChats1);
+  const [Message, setMessage] = useState<Message[]>([]);
+  const [newMessage, setNewMessage] = useState<Message>({} as Message);
+  const [ChatHistory, setChatHistory] = useState<Message[]>([]);
+  const [selectedChat, setSelectedChat] = useState<Message>();
+
   // chatMessages ควรเป็นdata
   const socketRef = useRef<Socket | null>(null);
-  const [isOpen, setIsOpen] = useState(false);
+
   const Chathandle = (chat: Message) => {
     setSelectedChat(chat);
+    fetchConversation();
+    setMessage([]);
   };
   let room = 12;
 
-  let a = ChatHistory.map(chatid => (
+  let componentChat = ChatHistory.map(chatid => (
     <div
       key={chatid.id}
       className={`p-2 border-b-2 cursor-pointer hover:bg-gray-200 ${
@@ -64,7 +63,7 @@ const ChatLayout: React.FC = () => {
       <div className="flex items-center">
         <Avatar />
         <div className="ml-2">
-          <div className="font-medium">{chatid.sender.name}</div>
+          <div className="font-medium">{chatid.User.firstname}</div>
           <div className="text-sm text-gray-500">
             {chatid.content.length > 20
               ? `${chatid.content.substring(0, 20)}...`
@@ -74,9 +73,8 @@ const ChatLayout: React.FC = () => {
       </div>
     </div>
   ));
-  console.log(a, 'test', parsedChats);
+
   const fetchHistory = async () => {
-    console.log('fetch');
     try {
       const res = await doGetRequest(`/api/fetch-history`);
       console.log(res, 'fetchHistory');
@@ -87,6 +85,7 @@ const ChatLayout: React.FC = () => {
       console.error('Error fetching messages:', error);
     }
   };
+
   useEffect(() => {
     fetchHistory();
   }, []);
@@ -105,84 +104,91 @@ const ChatLayout: React.FC = () => {
     }
   }, [room]);
 
-  const checkNotAdmin = (selectedChat: Message) => {
-    let userId = selectedChat.senderId;
-    if (selectedChat.sender.name === 'admin') {
-      userId = selectedChat.recipientId;
-    }
-    return userId;
-  };
+  // const checkNotAdmin = (selectedChat: Message) => {
+  //   let userId = selectedChat.senderId;
+  //   if (selectedChat.sender.name === 'admin') {
+  //     userId = selectedChat.recipientId;
+  //   }
+  //   return userId;
+  // };
 
-  const checkNotYour = (selectedChat: Message) => {
-    let userName = selectedChat.sender.name;
+  const checkNotYour = (selectedChat: Message | undefined) => {
+    if (!selectedChat) return '';
+    let userName = selectedChat.User.firstname;
     if (selectedChat.senderId === id) {
-      userName = selectedChat.recipient.name;
+      userName = selectedChat.User.firstname;
     }
-    return userName;
+    return ' ' + userName;
   };
-
-  const fetchMessages = async () => {
-    if (!selectedChat) return;
-
+  const fetchConversation = async () => {
+    if (!selectedChat?.Conversation.UserId) return;
     try {
-      const { data } = await axios.get(`/api/message/${selectedChat.id}`, {
-        headers: {
-          Authorization: `Bearer <your-token>`,
-        },
-      });
-      chatMessages.current = data;
+      const res: Message[] = await doGetRequest(
+        `/api/fetch-messages/${selectedChat.Conversation.UserId}`,
+      );
+      if (res.length > 0) {
+        setMessage(res);
+      }
+      console.log(res, 'fetchConversation');
     } catch (error) {
-      console.error('Failed to load messages:', error);
+      console.error('Error fetching conversation:', error);
     }
   };
 
   const sendMessage = async (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter' && newMessage) {
-      if (socketRef.current) {
-        socketRef.current.emit('stop typing', checkNotAdmin(selectedChat));
-      }
+    if (event.key === 'Enter') {
+      let msg: Message = {
+        id: null,
+        senderId: currentUserID,
+        content: input.trim(),
+        createdAt: new Date(),
+        isRead: false,
+        customerId: selectedChat?.Conversation.UserId ?? null,
+        Conversation: {
+          UserId: null,
+        },
+        User: {
+          firstname: null,
+          lastname: null,
+        },
+      };
+      // if (socketRef.current) {
+      //   socketRef.current.emit('stop typing', checkNotAdmin(selectedChat));
+      // }
+      let conId = selectedChat?.Conversation.UserId;
+      console.log(conId, 'conId');
       try {
-        const { data } = await axios.post(
-          '/api/message',
-          {
-            content: newMessage,
-            chatId: selectedChat.id,
-          },
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer <your-token>`,
-            },
-          },
+        const res = await doPostRequest(
+          { ...msg, conId },
+          '/api/create-messages/',
         );
-        if (socketRef.current) {
-          socketRef.current.emit('new message', data);
-        }
-        chatMessages.current = [...chatMessages.current, data];
-        setNewMessage('');
+        console.log(res, 'res');
+        // if (socketRef.current) {
+        //   socketRef.current.emit('new message', data);
+        // }
       } catch (error) {
         console.error('Failed to send the message:', error);
       }
     }
   };
 
-  useEffect(() => {
-    if (!socketRef.current) return;
+  // useEffect(() => {
+  //   if (!socketRef.current) return;
 
-    socketRef.current.on('message received', newMessageReceived => {
-      if (selectedChat.id !== newMessageReceived.chatId) {
-        console.warn('Received message for a different chat');
-      } else {
-        chatMessages.current = [...chatMessages.current, newMessageReceived];
-      }
-    });
+  //   socketRef.current.on('message received', newMessageReceived => {
+  //     if (selectedChat.id !== newMessageReceived.chatId) {
+  //       console.warn('Received message for a different chat');
+  //     } else {
+  //       chatMessages.current = [...chatMessages.current, newMessageReceived];
+  //     }
+  //   });
 
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.off('message received');
-      }
-    };
-  }, [selectedChat]);
+  //   return () => {
+  //     if (socketRef.current) {
+  //       socketRef.current.off('message received');
+  //     }
+  //   };
+  // }, [selectedChat]);
 
   return (
     <div className="flex h-[52rem]">
@@ -199,22 +205,23 @@ const ChatLayout: React.FC = () => {
         </div>
         <div className="mt-6">
           <div className="text-lg font-semibold">My Chats</div>
-          <div className="mt-2 space-y-2">{a}</div>
+          <div className="mt-2 space-y-2">{componentChat}</div>
         </div>
       </div>
       <div className="flex-1 flex flex-col bg-white shadow-lg">
         <div className="flex-1 p-4 overflow-y-auto">
           <div className="text-lg font-semibold">
-            Chat with {checkNotYour(selectedChat)}
+            Chat with
+            {checkNotYour(selectedChat)}
           </div>
-          {chatMessages.current.map((message, index) => {
+          {Message.map((message, index) => {
             // Determine if the time difference between the current message and the previous one is more than 5 minutes
             const showTimestamp =
               index === 0 ||
               (message.createdAt instanceof Date &&
-                chatMessages.current[index - 1].createdAt instanceof Date &&
+                Message[index - 1].createdAt instanceof Date &&
                 message.createdAt.getTime() -
-                  chatMessages.current[index - 1].createdAt.getTime() >
+                  Message[index - 1].createdAt.getTime() >
                   300000);
 
             return (
@@ -247,9 +254,19 @@ const ChatLayout: React.FC = () => {
             placeholder="Type a message..."
             value={input}
             onChange={e => setInput(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && sendMessage}
+            onKeyDown={e => e.key === 'Enter' && sendMessage(e)}
             className="flex-grow border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
           />
+          <button
+            onClick={() =>
+              sendMessage({
+                key: 'Enter',
+              } as React.KeyboardEvent<HTMLInputElement>)
+            }
+            className="ml-2 bg-orange-600 text-white rounded-lg px-3 py-2 text-sm"
+          >
+            send
+          </button>
         </div>
       </div>
     </div>

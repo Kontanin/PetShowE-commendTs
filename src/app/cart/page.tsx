@@ -140,7 +140,7 @@ const ShoppingBag = () => {
           </div>
         </div>
         <div className="mt-6 flex justify-end space-x-4">
-          <Link href="/products">
+          <Link href="/product">
             <button className="px-6 py-2 border rounded-lg">
               Continue Shopping
             </button>

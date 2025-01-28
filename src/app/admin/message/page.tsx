@@ -8,6 +8,16 @@ import io, { Socket } from 'socket.io-client';
 import axios from 'axios';
 import doGetRequest from '@/utils/doGetRequest';
 import doPostRequest from '@/utils/doPostRequest';
+import Cookies from 'js-cookie';
+export const endpoint = 'http://localhost:5000';
+import ChatMessages from './ChatMessages'; // Corrected import statement
+const initializeSocket = (token: string): Socket => {
+  return io(endpoint, {
+    auth: { token },
+  });
+};
+const token = Cookies.get('authToken') || 'default_token';
+const socketInstance = initializeSocket(token);
 // import { toast } from 'react-toastify'; // Assuming you're using react-toastify for notifications
 interface User {
   id: string;
@@ -21,6 +31,7 @@ interface Message {
   content: string;
   createdAt: Date;
   isRead: boolean;
+  customerId: string | null;
   Conversation: {
     UserId: string | null;
   };
@@ -28,37 +39,26 @@ interface Message {
     firstname: string | null;
     lastname: string | null;
   };
-  customerId: string | null;
 }
-
 const ChatLayout: React.FC = () => {
-  const { id } = UserStore();
   const [input, setInput] = useState('');
   const { id: currentUserID, firstName } = UserStore(); // Get the user ID from UserStore
   const [typing, setTyping] = useState(false);
-  const [socketConnected, setSocketConnected] = useState<boolean>(false);
-  const [Message, setMessage] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState<Message>({} as Message);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [ChatHistory, setChatHistory] = useState<Message[]>([]);
   const [selectedChat, setSelectedChat] = useState<Message>();
+  const socketRef = useRef<Socket>(socketInstance);
 
-  // chatMessages ควรเป็นdata
-  const socketRef = useRef<Socket | null>(null);
-
-  const Chathandle = (chat: Message) => {
+  const chatHandle = async (chat: Message) => {
     setSelectedChat(chat);
-    fetchConversation();
-    setMessage([]);
+    await fetchConversation();
   };
-  let room = 12;
-
+  let room = selectedChat?.Conversation.UserId;
   let componentChat = ChatHistory.map(chatid => (
     <div
       key={chatid.id}
-      className={`p-2 border-b-2 cursor-pointer hover:bg-gray-200 ${
-        selectedChat?.id === chatid.id ? 'bg-gray-100' : ''
-      }`}
-      onClick={() => Chathandle(chatid)}
+      className={`p-2 border-b-2 cursor-pointer hover:bg-gray-200 ${selectedChat?.id === chatid.id ? 'bg-gray-100' : ''}`}
+      onClick={() => chatHandle(chatid)}
     >
       <div className="flex items-center">
         <Avatar />
@@ -77,63 +77,81 @@ const ChatLayout: React.FC = () => {
   const fetchHistory = async () => {
     try {
       const res = await doGetRequest(`/api/fetch-history`);
-      console.log(res, 'fetchHistory');
+      console.log('fetchHistory response:', res);
       if (res.length > 0) {
-        setChatHistory(res);
+        return res;
       }
     } catch (error) {
       console.error('Error fetching messages:', error);
+      return [];
     }
   };
-
-  useEffect(() => {
-    fetchHistory();
-  }, []);
-
-  useEffect(() => {
-    if (socketRef) {
-      socketRef.current?.emit('joinRoom', room);
-      console.log(`Joined room: ${room}`);
-    }
-  }, [room]);
-
-  useEffect(() => {
-    if (socketRef) {
-      socketRef.current?.emit('joinRoom', room);
-      console.log(`Joined room: ${room}`);
-    }
-  }, [room]);
-
-  // const checkNotAdmin = (selectedChat: Message) => {
-  //   let userId = selectedChat.senderId;
-  //   if (selectedChat.sender.name === 'admin') {
-  //     userId = selectedChat.recipientId;
-  //   }
-  //   return userId;
-  // };
 
   const checkNotYour = (selectedChat: Message | undefined) => {
     if (!selectedChat) return '';
     let userName = selectedChat.User.firstname;
-    if (selectedChat.senderId === id) {
+    if (selectedChat.senderId === currentUserID) {
       userName = selectedChat.User.firstname;
     }
     return ' ' + userName;
   };
+
   const fetchConversation = async () => {
+    console.log(selectedChat, 'selectedChat');
     if (!selectedChat?.Conversation.UserId) return;
     try {
       const res: Message[] = await doGetRequest(
         `/api/fetch-messages/${selectedChat.Conversation.UserId}`,
       );
       if (res.length > 0) {
-        setMessage(res);
+        setMessages(res);
       }
-      console.log(res, 'fetchConversation');
+      console.log('fetchConversation');
     } catch (error) {
       console.error('Error fetching conversation:', error);
     }
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      let history = await fetchHistory();
+      console.log('Fetched history:', history);
+      setChatHistory(history);
+    };
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    console.log(ChatHistory, 'ChatHistory in useEffect');
+    if (ChatHistory.length > 0) {
+      setSelectedChat(ChatHistory[0]);
+      fetchConversation();
+    }
+    console.log('fetchHistory', messages[0], selectedChat, ChatHistory);
+  }, [ChatHistory]);
+
+  useEffect(() => {
+    if (socketRef && selectedChat) {
+      socketRef.current?.emit('joinRoom', room);
+      console.log(`Joined room: ${room}`);
+    }
+  }, [room]);
+
+  useEffect(() => {
+    if (socketRef.current) {
+      const handleNewMessage = (message: Message) => {
+        if (message.senderId !== currentUserID) {
+          setMessages((prevMessages: Message[]) => [...prevMessages, message]);
+        }
+      };
+
+      socketRef.current.on('new-message', handleNewMessage);
+
+      return () => {
+        socketRef.current.off('new-message');
+      };
+    }
+  }, [socketRef]);
 
   const sendMessage = async (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
@@ -152,43 +170,22 @@ const ChatLayout: React.FC = () => {
           lastname: null,
         },
       };
-      // if (socketRef.current) {
-      //   socketRef.current.emit('stop typing', checkNotAdmin(selectedChat));
-      // }
+      console.log(socketRef.current, 'socketRef.current');
       let conId = selectedChat?.Conversation.UserId;
       console.log(conId, 'conId');
       try {
-        const res = await doPostRequest(
-          { ...msg, conId },
-          '/api/create-messages/',
-        );
-        console.log(res, 'res');
-        // if (socketRef.current) {
-        //   socketRef.current.emit('new message', data);
-        // }
+        console.log(msg, 'room msg');
+        if (socketRef.current) {
+          socketRef.current.emit('sendMessageToRoom', {
+            roomName: room,
+            message: msg,
+          });
+        }
       } catch (error) {
         console.error('Failed to send the message:', error);
       }
     }
   };
-
-  // useEffect(() => {
-  //   if (!socketRef.current) return;
-
-  //   socketRef.current.on('message received', newMessageReceived => {
-  //     if (selectedChat.id !== newMessageReceived.chatId) {
-  //       console.warn('Received message for a different chat');
-  //     } else {
-  //       chatMessages.current = [...chatMessages.current, newMessageReceived];
-  //     }
-  //   });
-
-  //   return () => {
-  //     if (socketRef.current) {
-  //       socketRef.current.off('message received');
-  //     }
-  //   };
-  // }, [selectedChat]);
 
   return (
     <div className="flex h-[52rem]">
@@ -214,41 +211,9 @@ const ChatLayout: React.FC = () => {
             Chat with
             {checkNotYour(selectedChat)}
           </div>
-          {Message.map((message, index) => {
-            // Determine if the time difference between the current message and the previous one is more than 5 minutes
-            const showTimestamp =
-              index === 0 ||
-              (message.createdAt instanceof Date &&
-                Message[index - 1].createdAt instanceof Date &&
-                message.createdAt.getTime() -
-                  Message[index - 1].createdAt.getTime() >
-                  300000);
-
-            return (
-              <div key={message.id} className="flex flex-col items-center mb-2">
-                {showTimestamp && (
-                  <span className="text-xs text-gray-500">
-                    {new Date(message.createdAt).toLocaleTimeString()}
-                  </span>
-                )}
-                <div
-                  className={`flex w-full ${message.senderId == id ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-xs p-3 rounded-lg shadow-md ${
-                      message.senderId == id
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-gray-200 text-black'
-                    }`}
-                  >
-                    <p>{message.content}</p>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          <ChatMessages messages={messages} userId={currentUserID} />
         </div>
-        <div className="p-4 bg-gray-100 border-t">
+        <div className="flex p-4 bg-gray-100 border-t">
           <Input
             type="text"
             placeholder="Type a message..."

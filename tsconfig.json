@@ -30,6 +30,6 @@
     ".next/types/**/*.ts",
     ".next/types/*.ts",
     "src/app/test/page1.tsx"
-, "src/userAvatar/UserListItem.tsx", "src/app/test2/page.tss"  ],
+, "src/userAvatar/UserListItem.tsx", "src/app/test2/page.tss", "src/app/admin/message/ChatMessages.tsx"  ],
   "exclude": ["node_modules"]
 }

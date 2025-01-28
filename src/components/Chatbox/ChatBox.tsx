@@ -50,25 +50,19 @@ const ChatBox: React.FC<ChatBoxProps> = ({ newMessageCount }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  const [conversationId, setConversationId] = useState<string | null>(null);
-  const [socket, setSocket] = useState<Socket | null>(null);
+
   useEffect(() => {
+    console.log('ChatBox mounted', socketInstance, currentUserID);
     if (socketInstance) {
       socketInstance.on('new-message', (msg: Message) => {
-        console.log('New message:', msg);
-        setMessages(prevMessages => [msg, ...prevMessages]);
+        setMessages(prevMessages => [...prevMessages, msg]);
       });
-
-      if (conversationId) {
-        socketInstance.emit('joinConversation', conversationId);
-        console.log(`Joined conversation: ${conversationId}`);
+      if (currentUserID) {
+        socketInstance.emit('joinRoom', currentUserID);
+        console.log(`Joined conversation: ${currentUserID}`);
       }
     }
-
-    return () => {
-      socketInstance.off('new-message');
-    };
-  }, [conversationId]);
+  }, []);
 
   const fetchConversation = async () => {
     try {
@@ -91,6 +85,11 @@ const ChatBox: React.FC<ChatBoxProps> = ({ newMessageCount }) => {
       console.log(currentUserID, 'currentUserID');
     }
   };
+  if (socketInstance) {
+    socketInstance.on('new-message', (msg: Message) => {
+      setMessages(prevMessages => [...prevMessages, msg]);
+    });
+  }
 
   const handleSendMessage = async () => {
     const newMessage: Message = {
@@ -104,18 +103,16 @@ const ChatBox: React.FC<ChatBoxProps> = ({ newMessageCount }) => {
 
     try {
       const res = await doPostRequest(
-        { ...newMessage, conversationId },
+        { ...newMessage, currentUserID },
         '/api/create-messages/',
       );
       if (res.status) {
         throw new Error('Failed to send message');
       }
-      console.log(res.data, 'sendd');
-      socketInstance.emit('sendMessageToConversation', {
-        conversationId,
+      socketInstance.emit('sendMessageToRoom', {
+        roomName: currentUserID,
         message: newMessage,
       });
-
       setMessages(prevMessages => [newMessage, ...prevMessages]);
       setInput('');
     } catch (error) {
@@ -139,7 +136,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ newMessageCount }) => {
             </div>
             <div className="flex-1 overflow-y-auto">
               <div className="text-gray-600 text-sm flex flex-col space-y-2">
-                {messages.reverse().map((message, index) => (
+                {messages.map((message, index) => (
                   <div
                     key={index}
                     className={classNames(

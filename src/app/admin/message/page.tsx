@@ -5,7 +5,6 @@ import { Breadcrumbs, BreadcrumbItem } from '@nextui-org/react';
 import Link from 'next/link';
 import { UserStore } from '@/store/UserStore';
 import io, { Socket } from 'socket.io-client';
-import axios from 'axios';
 import doGetRequest from '@/utils/doGetRequest';
 import doPostRequest from '@/utils/doPostRequest';
 import Cookies from 'js-cookie';
@@ -54,25 +53,30 @@ const ChatLayout: React.FC = () => {
     await fetchConversation();
   };
   let room = selectedChat?.Conversation.UserId;
-  let componentChat = ChatHistory.map(chatid => (
-    <div
-      key={chatid.id}
-      className={`p-2 border-b-2 cursor-pointer hover:bg-gray-200 ${selectedChat?.id === chatid.id ? 'bg-gray-100' : ''}`}
-      onClick={() => chatHandle(chatid)}
-    >
-      <div className="flex items-center">
-        <Avatar />
-        <div className="ml-2">
-          <div className="font-medium">{chatid.User.firstname}</div>
-          <div className="text-sm text-gray-500">
-            {chatid.content.length > 20
-              ? `${chatid.content.substring(0, 20)}...`
-              : chatid.content}
+  let componentChat =
+    ChatHistory.length > 0 ? (
+      ChatHistory.map(chatid => (
+        <div
+          key={chatid.id}
+          className={`p-2 border-b-2 cursor-pointer hover:bg-gray-200 ${selectedChat?.id === chatid.id ? 'bg-gray-100' : ''}`}
+          onClick={() => chatHandle(chatid)}
+        >
+          <div className="flex items-center">
+            <Avatar />
+            <div className="ml-2">
+              <div className="font-medium">{chatid.User.firstname}</div>
+              <div className="text-sm text-gray-500">
+                {chatid.content.length > 20
+                  ? `${chatid.content.substring(0, 20)}...`
+                  : chatid.content}
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-  ));
+      ))
+    ) : (
+      <div> No chat now </div>
+    );
 
   const fetchHistory = async () => {
     try {
@@ -115,14 +119,15 @@ const ChatLayout: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       let history = await fetchHistory();
-      console.log('Fetched history:', history);
-      setChatHistory(history);
+      console.log(history, 'history');
+      if (history) {
+        setChatHistory(history);
+      }
     };
     fetchData();
   }, []);
 
   useEffect(() => {
-    console.log(ChatHistory, 'ChatHistory in useEffect');
     if (ChatHistory.length > 0) {
       setSelectedChat(ChatHistory[0]);
       fetchConversation();
@@ -172,9 +177,8 @@ const ChatLayout: React.FC = () => {
       };
       console.log(socketRef.current, 'socketRef.current');
       let conId = selectedChat?.Conversation.UserId;
-      console.log(conId, 'conId');
       try {
-        console.log(msg, 'room msg');
+
         if (socketRef.current) {
           socketRef.current.emit('sendMessageToRoom', {
             roomName: room,
@@ -202,7 +206,9 @@ const ChatLayout: React.FC = () => {
         </div>
         <div className="mt-6">
           <div className="text-lg font-semibold">My Chats</div>
-          <div className="mt-2 space-y-2">{componentChat}</div>
+          <div className="mt-2 space-y-2">
+            {ChatHistory.length > 0 ? componentChat : <div> No chat now </div>}
+          </div>
         </div>
       </div>
       <div className="flex-1 flex flex-col bg-white shadow-lg">

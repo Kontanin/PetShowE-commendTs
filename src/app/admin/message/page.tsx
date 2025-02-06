@@ -6,9 +6,9 @@ import Link from 'next/link';
 import { UserStore } from '@/store/UserStore';
 import io, { Socket } from 'socket.io-client';
 import doGetRequest from '@/utils/doGetRequest';
-import doPostRequest from '@/utils/doPostRequest';
 import Cookies from 'js-cookie';
-export const endpoint = 'http://localhost:5000';
+const endpoint: string | undefined | never = process.env.endpoint;
+
 import ChatMessages from './ChatMessages'; // Corrected import statement
 const initializeSocket = (token: string): Socket => {
   return io(endpoint, {
@@ -18,11 +18,6 @@ const initializeSocket = (token: string): Socket => {
 const token = Cookies.get('authToken') || 'default_token';
 const socketInstance = initializeSocket(token);
 // import { toast } from 'react-toastify'; // Assuming you're using react-toastify for notifications
-interface User {
-  id: string;
-  name: string;
-  email: string;
-}
 
 interface Message {
   id: number | null;
@@ -41,8 +36,8 @@ interface Message {
 }
 const ChatLayout: React.FC = () => {
   const [input, setInput] = useState('');
-  const { id: currentUserID, firstName } = UserStore(); // Get the user ID from UserStore
-  const [typing, setTyping] = useState(false);
+  const { id: currentUserID } = UserStore(); // Get the user ID from UserStore
+  // const [typing, setTyping] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [ChatHistory, setChatHistory] = useState<Message[]>([]);
   const [selectedChat, setSelectedChat] = useState<Message>();
@@ -176,9 +171,7 @@ const ChatLayout: React.FC = () => {
         },
       };
       console.log(socketRef.current, 'socketRef.current');
-      let conId = selectedChat?.Conversation.UserId;
       try {
-
         if (socketRef.current) {
           socketRef.current.emit('sendMessageToRoom', {
             roomName: room,

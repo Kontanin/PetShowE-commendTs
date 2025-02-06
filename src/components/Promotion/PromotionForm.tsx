@@ -42,7 +42,7 @@ const PromotionForm: React.FC<PromotionFormProps> = ({ products, initialPromotio
 
   const uniqueCompanies = Array.from(new Set(products.map(product => product.company)));
   const uniqueCategories = Array.from(new Set(products.map(product => product.category)));
-
+  console.log(promotion);
   return (
     <form onSubmit={handleFormSubmit} className="mb-6">
       <InputWithLabel

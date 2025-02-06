@@ -24,7 +24,7 @@ const AddProductPage: React.FC = () => {
     description: '',
     price: 0
   });
-  const [userId, setUserId] = useState<string>(''); // Assume we get this from the context or props
+  // const [userId, setUserId] = useState<string>(''); // Assume we get this from the context or props
 
   useEffect(() => {
     // Fetch products from backend API

@@ -13,15 +13,15 @@ import Image from 'next/image';
 export default function NavbarMain() {
   const [isOpen, setIsOpen] = useState(false);
 
-  const handle = () => {
-    console.log('clicked', isOpen);
-    setIsOpen(!isOpen);
-  };
+  // const handle = () => {
+  //   console.log('clicked', isOpen);
+  //   setIsOpen(!isOpen);
+  // };
 
   return (
     <Navbar className="bg-amber-300 max-h-full max-w-full flex flex-auto text-base  ">
       <NavbarBrand>
-        <Link href="/">
+        <Link href="/" aria-label="Close menu">
           <Image
             src="/icon/pawprint.png"
             width={40}
@@ -59,7 +59,5 @@ export default function NavbarMain() {
       {/* end part  */}
       <Lastpart />
     </Navbar>
-
-
   );
 }

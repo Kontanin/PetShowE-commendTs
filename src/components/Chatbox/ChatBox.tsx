@@ -8,7 +8,7 @@ import Cookies from 'js-cookie';
 import doGetRequest from '@/utils/doGetRequest';
 import doPostRequest from '@/utils/doPostRequest';
 
-export const endpoint = 'http://localhost:5000';
+const endpoint: string | undefined | never = process.env.endpoint;
 
 const initializeSocket = (token: string): Socket => {
   return io(endpoint, {
@@ -16,11 +16,11 @@ const initializeSocket = (token: string): Socket => {
   });
 };
 
-interface User {
-  id: string;
-  firstName: string;
-  lastName: string;
-}
+// interface User {
+//   id: string;
+//   firstName: string;
+//   lastName: string;
+// }
 
 interface Message {
   id: number | null;
@@ -31,22 +31,15 @@ interface Message {
   customerId: string;
 }
 
-interface Conversation {
-  id: string;
-  participants: User[];
-  messages: Message[];
-}
-
 interface ChatBoxProps {
   newMessageCount: number;
 }
 
 const ChatBox: React.FC<ChatBoxProps> = ({ newMessageCount }) => {
-  let j = [];
   const token = Cookies.get('authToken') || 'default_token';
   const socketInstance = initializeSocket(token);
 
-  const { id: currentUserID, firstName } = UserStore(); // Get the user ID from UserStore
+  const { id: currentUserID } = UserStore(); // Get the user ID from UserStore
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');

@@ -3,7 +3,6 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
-import items from '@/data/OrderProduct.json';
 import { useRouter } from 'next/navigation';
 import doPostRequest from '@/utils/doPostRequest';
 import { OrderProduct, OrderPayload } from '@/types/OrderProductType';

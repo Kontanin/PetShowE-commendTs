@@ -10,6 +10,15 @@ import {
   Dropdown,
   DropdownMenu,
 } from '@nextui-org/react';
+
+const dropdownItems = [
+  { key: 'dog', href: '/product?category=dog', label: 'Dog' },
+  { key: 'cat', href: '/product?category=cat', label: 'Cat' },
+  { key: 'bird', href: '/product?category=bird', label: 'Bird' },
+  { key: 'water-animal', href: '/product?category=water-animal', label: 'Water Animal' },
+  { key: 'exotic', href: '/product?category=exotic', label: 'Exotic' },
+];
+
 export default function FristPart() {
   return (
     <Dropdown>
@@ -31,54 +40,17 @@ export default function FristPart() {
           base: 'gap-1',
         }}
       >
-        <DropdownItem>
-          <Link
-            href="/product?category=dog"
-            className="grid justify-items-center"
-            color="foreground"
-          >
-            Dog
-          </Link>
-        </DropdownItem>
-        <DropdownItem>
-          <Link
-            href="/product?category=cat"
-            className="grid justify-items-center"
-            color="foreground"
-          >
-            Cat
-          </Link>
-        </DropdownItem>
-
-        <DropdownItem>
-          <Link
-            href="/product?category=cat"
-            className="grid justify-items-center"
-            color="foreground"
-          >
-            Bird
-          </Link>
-        </DropdownItem>
-
-        <DropdownItem>
-          <Link
-            href="/product?category=water-animal"
-            className="grid justify-items-center"
-            color="foreground"
-          >
-            Water Animal
-          </Link>
-        </DropdownItem>
-
-        <DropdownItem>
-          <Link
-            href="/product?category=exotic"
-            color="foreground"
-            className="grid justify-items-center"
-          >
-            Exotic
-          </Link>
-        </DropdownItem>
+        {dropdownItems.map(item => (
+          <DropdownItem key={item.key}>
+            <Link
+              href={item.href}
+              className="grid justify-items-center"
+              color="foreground"
+            >
+              {item.label}
+            </Link>
+          </DropdownItem>
+        ))}
       </DropdownMenu>
     </Dropdown>
   );
